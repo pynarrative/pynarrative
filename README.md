@@ -194,7 +194,7 @@ Comprehensive documentation is available for pynarrative, providing detailed inf
 
 The documentation is accessible on GitHub at:
 
-[pynarrative Documentation](https://github.com/Robeonekenoby/pynarrative-doc)
+[pynarrative Documentation](https://pynarrative.github.io/doc/)
 
 ## Advanced Usage
 
