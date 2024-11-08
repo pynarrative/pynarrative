@@ -55,7 +55,7 @@ final_chart = (pn.Story(data, width=600, height=400)
         position='top', 
         color="#2ecc71"
     )
-    .add_next_step(
+    .add_next_steps(
         "Click for details", 
         position='bottom', 
         color="#3498db"
@@ -71,12 +71,12 @@ final_chart = (pn.Story(data, width=600, height=400)
         label_size=14,
         show_point=True
     )
-    .add_next_step(
+    .add_next_steps(
         type='line_steps',
         texts=["Phase 1", "Phase 2", "Phase 3", "Phase 4"],
         position='bottom'
     )
-    .add_next_step(
+    .add_next_steps(
         type='button',
         text="Click here",
         url="https://example.com",
@@ -119,7 +119,7 @@ customized_chart = (pn.Story(data, width=600, height=400)
         position='top', 
         color="#2ecc71"
     )
-    .add_next_step(
+    .add_next_steps(
         "Click for details", 
         position='bottom', 
         color="#3498db"
@@ -145,7 +145,7 @@ customized_chart = (pn.Story(data, width=600, height=400)
         line_steps_font_size=6
     )
     # Customized button
-    .add_next_step(
+    .add_next_steps(
         type='button',
         text="Click here",
         url="https://example.com",
@@ -160,14 +160,14 @@ customized_chart = (pn.Story(data, width=600, height=400)
         button_opacity=0.3
     )
     # Basic stair steps
-    .add_next_step(
+    .add_next_steps(
         type='stair_steps',
         texts=["Level 1", "Level 2", "Level 3", "Level 4"],
         position='right'
     )
     # Direct use of NextStep class
-    .add_next_step(
-        custom_button=pn.NextStep(
+    .add_next_steps(
+        mode=pn.NextStep(
             type='button',
             text='Click here',
             position='left',
