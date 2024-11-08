@@ -55,7 +55,7 @@ final_chart = (pn.Story(data, width=600, height=400)
         position='top', 
         color="#2ecc71"
     )
-    .add_next_steps(
+    .add_s(
         "Click for details", 
         position='bottom', 
         color="#3498db"
@@ -83,7 +83,7 @@ final_chart = (pn.Story(data, width=600, height=400)
         position='top',
         title="Next steps"
     )
-    .add_next_step(
+    .add_next_steps(
         type='stair_steps',
         texts=["Level 1", "Level 2", "Level 3", "Level 4", "Level 5"],
         position='right'
@@ -136,7 +136,7 @@ customized_chart = (pn.Story(data, width=600, height=400)
         show_point=True
     )
     # Customized linear steps
-    .add_next_step(
+    .add_next_steps(
         type='line_steps',
         texts=["Phase 1", "Phase 2", "Phase 3", "Phase 4"],
         position='bottom',
