@@ -55,7 +55,7 @@ final_chart = (pn.Story(data, width=600, height=400)
         position='top', 
         color="#2ecc71"
     )
-    .add_s(
+    .add_next_steps(
         "Click for details", 
         position='bottom', 
         color="#3498db"
