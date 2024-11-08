@@ -210,3 +210,4 @@ pynarrative is released under the MIT License, allowing both personal and commer
 
 ## Authors
 
+pynarrative was implemented by Roberto Olinto Barsotti as a master's thesis project in digital humanity, under the supervision of professor Angelica Lo Duca
