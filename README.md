@@ -207,3 +207,6 @@ pynarrative is an open-source project, and we welcome contributions from the com
 ## License
 
 pynarrative is released under the MIT License, allowing both personal and commercial use with minimal restrictions. See the LICENSE file in the repository for the complete license text.
+
+## Authors
+
