@@ -186,7 +186,7 @@ The documentation is accessible on GitHub at:
 
 ## Advanced Usage
 
-pynarrative supports sophisticated narrative techniques through its advanced features. The NextStep system allows the creation of guided narratives with multiple interaction points. Annotations can be highly customized with different arrow styles, colors, and positioning. The library also provides flexible positioning systems for all narrative elements, allowing precise control over your story's visual hierarchy.
+pynarrative supports sophisticated narrative techniques through its advanced features, such as creating guided narratives with multiple interaction points. Annotations can be highly customized with different arrow styles, colors, and positioning. The library also provides flexible positioning systems for all narrative elements, allowing precise control over your story's visual hierarchy.
 
 ## Contributing
 
