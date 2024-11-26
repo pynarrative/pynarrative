@@ -165,15 +165,7 @@ customized_chart = (pn.Story(data, width=600, height=400)
         texts=["Level 1", "Level 2", "Level 3", "Level 4"],
         position='right'
     )
-    # Direct use of NextStep class
-    .add_next_steps(
-        mode=pn.NextStep(
-            type='button',
-            text='Click here',
-            position='left',
-            url='https://example.com'
-        )
-    )
+    
     .render()
 )
 ```
@@ -183,10 +175,6 @@ These examples demonstrate how pynarrative allows you to create rich, interactiv
 ## The Story Class
 
 The Story class is the main interface for creating narrative visualizations. It extends Altair's functionality with methods specifically designed for storytelling. Through this class, you can add titles and subtitles, include explanatory text to provide context and insights, highlight specific data points with customizable arrows and labels, and integrate interactive guidance elements. All Story methods support method chaining, allowing for a fluid and intuitive API.
-
-## The NextStep Class
-
-NextStep provides specialized support for creating interactive guidance elements within your visualizations. It offers three main types of interactive elements: buttons, which provide clickable elements for basic interactions; linear steps, which create progression guides for sequential narratives; and stair steps, which display hierarchical visualizations for progressive disclosure. Each type can be fully customized with colors, fonts, sizes, and positioning to match your visualization's style.
 
 ## Documentation
 
