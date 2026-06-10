@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.17.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "strokeWidth": 0}, "axis": {"grid": false}, "bar": {"color": "#1d4ed8"}, "legend": {"labelColor": "#334e68", "labelFont": "Helvetica", "labelFontSize": 12, "titleColor": "#0b1f3a", "titleFont": "Helvetica", "titleFontSize": 12}, "mark": {"strokeWidth": 2.5}, "range": {"category": ["#1d4ed8", "#3b82f6", "#60a5fa", "#93c5fd"]}, "title": {"color": "#0b1f3a", "font": "Helvetica", "fontSize": 32}}, "vconcat": [{"data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "mark": {"type": "text", "align": "center", "baseline": "top", "color": "#0b1f3a", "font": "Helvetica", "fontSize": 32, "fontWeight": "bold", "text": "Tourist Demand and Cultural Absorption in Florence 2017"}, "encoding": {"x": {"value": 450.0}, "y": {"value": 4}}, "height": 70, "width": 900.0}, {"vconcat": [{"hconcat": [{"data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "mark": {"type": "text", "align": "center", "angle": 270, "baseline": "middle", "color": "#3b5b8a", "font": "Helvetica", "fontSize": 16, "lineBreak": "\n", "text": "Source: Open Data Toscana"}, "encoding": {"x": {"value": 24.0}, "y": {"value": 200.0}}, "height": 400, "width": 48}, {"layer": [{"mark": {"type": "rect", "color": "#eff6ff", "cornerRadius": 8, "opacity": 1.0, "stroke": "#bfdbfe", "strokeWidth": 1}, "encoding": {"x": {"value": 0}, "x2": {"value": 300.0}, "y": {"value": 0}, "y2": {"value": 337.09999999999997}}}, {"mark": {"type": "text", "align": "left", "baseline": "top", "color": "#102a43", "font": "Helvetica", "fontSize": 19, "lineBreak": "\n", "lineHeight": 24.7, "text": "In 2017, Florence\nrecorded over 5.2\nmillion tourist\narrivals, while\nmunicipal museums\nregistered approximately\n1.4 million visits,\nrevealing a structural\ngap between overall\nurban tourism demand and\nthe portion absorbed by\ninstitutional cultural\ninfrastructure."}, "encoding": {"x": {"value": 8}, "y": {"value": 8}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 337.09999999999997, "width": 300.0}, {"layer": [{"mark": {"type": "bar", "size": 200}, "encoding": {"color": {"field": "segment", "legend": null, "type": "nominal"}, "x": {"axis": {"labelAngle": 0}, "field": "segment", "title": "", "type": "nominal"}, "y": {"axis": {"format": ","}, "field": "value", "title": "People", "type": "quantitative"}}}, {"mark": {"type": "text", "color": "#1f2a44", "dy": -10, "fontSize": 13, "fontWeight": "bold"}, "encoding": {"text": {"field": "value", "format": ",", "type": "quantitative"}, "x": {"field": "segment", "type": "nominal"}, "y": {"field": "value", "type": "quantitative"}}}], "data": {"name": "data-dba4c8b0e5be8f08d49c7da6b6e9bd81"}, "height": 400, "width": 600}]}, {"hconcat": [{"layer": [{"mark": {"type": "rect", "color": "#dbeafe", "cornerRadius": 8, "opacity": 1.0, "stroke": "#93c5fd", "strokeWidth": 1}, "encoding": {"x": {"axis": null, "field": "x", "type": "quantitative"}, "x2": {"field": "x2"}, "y": {"axis": null, "field": "y", "type": "quantitative"}, "y2": {"field": "y2"}}}, {"mark": {"type": "text", "align": "center", "baseline": "top", "clip": true, "color": "#102a43", "font": "Helvetica", "fontSize": 13, "lineBreak": "\n", "lineHeight": 15}, "encoding": {"text": {"field": "text", "type": "nominal"}, "x": {"axis": null, "field": "x_mid", "type": "quantitative"}, "y": {"axis": null, "field": "y_text", "type": "quantitative"}}}], "height": 127, "title": {"text": ["Lesson learned for citizens"], "color": "#0b1f3a", "font": "Helvetica", "fontSize": 18, "offset": 10}, "width": 900.0}], "data": {"name": "data-b7798e314339a354baf22c25a972a392"}}]}], "resolve": {"axis": {"x": "independent", "y": "independent"}}, "$schema": "https://vega.github.io/schema/vega-lite/v5.17.0.json", "datasets": {"data-6fad5c34291b82fc9632cbce143d677a": [{"_": 0}], "data-dba4c8b0e5be8f08d49c7da6b6e9bd81": [{"segment": "Tourist arrivals", "value": 5270527}, {"segment": "Municipal museum visits", "value": 1430131}], "data-b7798e314339a354baf22c25a972a392": [{"x": 80.0, "y": 0, "x2": 320.0, "y2": 117, "text": "Cultural venues absorb only\npart of tourism demand. A\nlarge share of visitors\nremains distributed across\npublic spaces beyond\ninstitutional\ninfrastructure.", "x_mid": 200.0, "y_text": 111}, {"x": 330.0, "y": 0, "x2": 570.0, "y2": 117, "text": "Urban space is a shared and\nlimited resource. Tourist\nflows, residents, and daily\nactivities coexist and\ncompete within the same\nareas.", "x_mid": 450.0, "y_text": 111}, {"x": 580.0, "y": 0, "x2": 820.0, "y2": 117, "text": "Understanding interaction\nimproves urban awareness.\nRecognizing how different\nurban uses overlap helps\ncitizens interpret everyday\ncongestion and livability\nchallenges.", "x_mid": 700.0, "y_text": 111}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
