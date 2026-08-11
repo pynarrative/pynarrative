@@ -1,0 +1,16 @@
+README.md
+setup.py
+src/pynarrative/__init__.py
+src/pynarrative/environmental_template.py
+src/pynarrative/historical_template.py
+src/pynarrative/layout.py
+src/pynarrative/minimal_template.py
+src/pynarrative/story.py
+src/pynarrative/style.py
+src/pynarrative/template.py
+src/pynarrative.egg-info/PKG-INFO
+src/pynarrative.egg-info/SOURCES.txt
+src/pynarrative.egg-info/dependency_links.txt
+src/pynarrative.egg-info/requires.txt
+src/pynarrative.egg-info/top_level.txt
+tests/tests.py
