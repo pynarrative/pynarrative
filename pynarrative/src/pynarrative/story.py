@@ -1,5 +1,7 @@
 import altair as alt
 import pandas as pd
+import re
+import os
 
 from .templates.template import DefaultTemplate, Template
 
@@ -595,7 +597,7 @@ class Story:
         - orientation: 'horizontal' or 'vertical' (default: 'horizontal')
         - math: one of "min", "max", "mean" or "median", authomatically calculated. If used, "value" must be a list or a pandas serie.
         - color: line color. If not specified, the color specified in the Template file will be used.
-        - label_text (str, optional): Custom text displayed next to the line. If not provided (empty string), the line's numerical value is displayed instead. If you do not want a label to be showed, use "label_text = ''".
+        - label_text (str, optional): Custom text displayed next to the line. If not provided (empty string), the line's numerical value is displayed instead. (Hint: if you do not want a label to be showed, use "label_text = " " - with a white space inside)".
         - label_dx (float, optional): Horizontal offset (in pixels or data units) for the label position. Defaults to 0.
         - label_dy (float, optional): Vertical offset (in pixels or data units) for the label position. Defaults to 0.
         - label_font_size (str, optional): Font size of the label text.
@@ -686,7 +688,12 @@ class Story:
         #Label
         data_label = data.copy()
         if label_text == "":
-            label_text = str(line_value) #etichetta di default col valore numerico
+            if math == "mean":
+                label_text = f"Mean {str(line_value)}"
+            elif math == "median":
+                label_text = f"Median {str(line_value)}"
+            else:
+                label_text = str(line_value) #etichetta di default col valore numerico
 
         if orientation == 'horizontal':
             data_label['label_x'] = 0 
@@ -769,9 +776,8 @@ class Story:
             raise ValueError(f"Category '{category}' not found in field '{category_field}'.")
 
         
-
         #NUOVO (gestione highlights con serie di valori)
-        has_series, _ = self._get_encoding_field_and_type("color") #se nell'encodind del grafico è definito il valore "color"...
+        has_series, _ = self._get_encoding_field_and_type("color") #se nell'encoding del grafico è definito il valore "color"...
         if has_series is not None:
             self.chart = self.chart.encode(
                 opacity = alt.condition(
@@ -1409,7 +1415,7 @@ class Story:
         self
             Returns the current instance to allow method chaining.
 
-        '''        
+        '''
         has_series, _ = self._get_encoding_field_and_type('color')
         if has_series is not None:
             raise ValueError("add_labels_chart can NOT be used on charts with multiple series")
@@ -1443,7 +1449,6 @@ class Story:
         if font_weight != "bold":
             font_weight = "normal"
 
-
         try:
             if values:
                 labels = values
@@ -1463,8 +1468,8 @@ class Story:
             mark_color = self.colors["chart_label_color"]
 
         self.label_layer = alt.Chart(self.data).encode(
-            x=alt.X(self.encoding['x'].shorthand),
-            y=alt.X(self.encoding['y'].shorthand),
+            x=self.encoding['x'],
+            y=self.encoding['y'],
             text=text_encoding
         ).mark_text(
             align = "center",
@@ -1480,11 +1485,25 @@ class Story:
         return self
 
 
+    def render(self, save = False, filename = False, ppi = False):        
+        """
+        It renders all layers of the story in a single graphic.  
 
-    def render(self):
+        Parameters
+        - save: allow user to download the chart in a chosen format (value must be "svg", "png" or "pdf"). Filename is by default the title of the chart as setted in .add_title() method
+        - ppi (pixel per inch, only used with save = "png"): image definition
         """
-        It renders all layers of the story in a single graphic.       
-        """
+
+        if ppi > 500:
+            print("Alert: too big ppi value can slow down code execution")
+        elif not ppi:
+            ppi = 150
+        if save not in ["svg", "png", "pdf", False]: #Gestione errori
+            print('Alert: format not supported ("svg", "png" and "pdf" format are supported). Fallback to svg format.')
+            save = "svg"
+            # raise ValueError('save value must be one of "svg", "png", "pdf"')
+            
+
         def _vstack(charts):
             if not charts:
                 return None
@@ -1639,8 +1658,7 @@ class Story:
             category = self.chart_style["series_colors"]
         )
 
-
-        
+       
 
         if self._is_bar_chart():
             wrap_threshold = self.chart_style['bar_label_wrap_threshold']
@@ -1653,12 +1671,26 @@ class Story:
                 )
             )
 
-        return main_chart.resolve_axis(x="shared", y="shared")
+        #SAVE
+        if not filename: #default
+            filename = "no_name_chart"
+            for layer in self.story_layers:
+                if layer["type"] == "title":
+                    filename = layer["title"]
+            filename = filename.lower()
+            filename = re.sub(" ", "_", filename)
+
+        os.makedirs("export", exist_ok = True) #crea la cartella export se non esiste
+        
+        if save is not False:
+            main_chart.save(f"export/{filename}.{save}")
+            if save == "png":
+                main_chart.save(f"export/{filename}.png", ppi = ppi)
+            print(f"Your file {filename}.{save} was succesfully downloaded into the export directory!")
+
+        return main_chart.resolve_axis(x="shared", y="shared")  
 
 
-    
-
-    
 
 def story(data=None, **kwargs):
     """
