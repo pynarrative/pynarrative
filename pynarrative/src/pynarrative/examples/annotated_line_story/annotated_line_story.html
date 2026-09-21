@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.17.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "strokeWidth": 0}, "axis": {"domainColor": "#c7d2fe", "grid": false, "labelColor": "#334e68", "labelFont": "Helvetica", "labelFontSize": 13, "tickColor": "#c7d2fe", "titleColor": "#0b1f3a", "titleFont": "Helvetica", "titleFontSize": 14}, "bar": {"color": "#1d4ed8"}, "legend": {"labelColor": "#334e68", "labelFont": "Helvetica", "labelFontSize": 12, "titleColor": "#0b1f3a", "titleFont": "Helvetica", "titleFontSize": 12}, "mark": {"strokeWidth": 2.5}, "range": {"category": ["#1d4ed8", "#3b82f6", "#60a5fa", "#93c5fd"]}, "title": {"color": "#0b1f3a", "font": "Helvetica", "fontSize": 32}}, "vconcat": [{"layer": [{"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#0b1f3a", "font": "Helvetica", "fontSize": 32, "fontWeight": "bold", "text": "Campaign Lift and Drop"}, "encoding": {"x": {"value": 450.0}, "y": {"value": 4}}}, {"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#2a4f85", "font": "Helvetica", "fontSize": 24, "text": "Peak month highlights the campaign impact"}, "encoding": {"x": {"value": 450.0}, "y": {"value": 38}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 70, "width": 900.0}, {"hconcat": [{"hconcat": [{"layer": [{"mark": {"type": "rect", "color": "#eff6ff", "cornerRadius": 8, "opacity": 1.0, "stroke": "#bfdbfe", "strokeWidth": 1}, "encoding": {"x": {"value": 0}, "x2": {"value": 300.0}, "y": {"value": 0}, "y2": {"value": 238.29999999999998}}}, {"mark": {"type": "text", "align": "left", "baseline": "top", "color": "#102a43", "font": "Helvetica", "fontSize": 19, "lineBreak": "\n", "lineHeight": 24.7, "text": "Sales spike sharply in\nmonth 4 after the\ncampaign launch, then\nnormalize. This suggests\na strong but short-lived\nlift.Sales spike sharply\nin month 4 after the\ncampaign launch, then\nnormalize."}, "encoding": {"x": {"value": 8}, "y": {"value": 8}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 238.29999999999998, "width": 300.0}, {"layer": [{"data": {"name": "data-36b20e3531bb294b389cc33d234d4664"}, "mark": {"type": "line"}, "encoding": {"x": {"field": "month", "title": "Month", "type": "quantitative"}, "y": {"field": "sales", "title": "Sales", "type": "quantitative"}}}, {"layer": [{"mark": {"type": "rule", "stroke": "#bfdbfe", "strokeWidth": 2}, "encoding": {"x": {"field": "connector_x", "type": "quantitative"}, "x2": {"field": "tip_x"}, "y": {"field": "connector_y", "type": "quantitative"}, "y2": {"field": "tip_y"}}}, {"mark": {"type": "rect", "color": "#eff6ff", "cornerRadius": 8, "opacity": 1.0, "stroke": "#bfdbfe", "strokeWidth": 1}, "encoding": {"x": {"field": "box_x1", "type": "quantitative"}, "x2": {"field": "box_x2"}, "y": {"field": "box_y1", "type": "quantitative"}, "y2": {"field": "box_y2"}}}, {"mark": {"type": "text", "align": "left", "baseline": "top", "color": "#102a43", "font": "Helvetica", "fontSize": 12, "lineBreak": "\n", "lineHeight": 15.600000000000001, "text": "Campaign peak Sales rise abruptly\nin month 4 immediately after the\ncampaign launch, indicating a\nstrong short-term response from the\ntarget audience. Sales rise\nabruptly in month 4 immediately\nafter the campaign launch,\nindicating a strong short-term\nresponse from the target audience."}, "encoding": {"x": {"field": "text_x", "type": "quantitative"}, "y": {"field": "text_y", "type": "quantitative"}}}], "data": {"name": "data-ec0489f51f4e0ffd05446cb0e00c4c7e"}}], "height": 400, "width": 600}]}, {"data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "mark": {"type": "text", "align": "center", "angle": 90, "baseline": "middle", "color": "#3b5b8a", "font": "Helvetica", "fontSize": 16, "lineBreak": "\n", "text": "Source: Monthly campaign tracking data"}, "encoding": {"x": {"value": 45.0}, "y": {"value": 200.0}}, "height": 400, "width": 90}]}], "resolve": {"axis": {"x": "independent", "y": "independent"}}, "$schema": "https://vega.github.io/schema/vega-lite/v5.17.0.json", "datasets": {"data-6fad5c34291b82fc9632cbce143d677a": [{"_": 0}], "data-36b20e3531bb294b389cc33d234d4664": [{"month": 1, "sales": 10}, {"month": 2, "sales": 12}, {"month": 3, "sales": 18}, {"month": 4, "sales": 28}, {"month": 5, "sales": 16}, {"month": 6, "sales": 14}], "data-ec0489f51f4e0ffd05446cb0e00c4c7e": [{"subject_x": 4, "subject_y": 28, "connector_x": 3.1666666666666665, "connector_y": 26.659, "tip_x": 3.9583333333333335, "tip_y": 27.932949999999998, "box_x1": 2.0666666666666664, "box_x2": 4.266666666666667, "box_y1": 17.182000000000002, "box_y2": 26.659, "text_x": 2.1166666666666663, "text_y": 26.659}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

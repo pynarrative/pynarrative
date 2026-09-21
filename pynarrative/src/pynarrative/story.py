@@ -1,7 +1,10 @@
 import altair as alt
 import pandas as pd
+import geopandas as gpd
 import re
 import os
+import warnings
+
 
 from .templates.template import DefaultTemplate, Template
 
@@ -14,7 +17,7 @@ class Story:
     the creation of more engaging and informative data visualisations.
     """
 
-    def __init__(self, data=None, width=None, height=None, font=None, base_font_size=None, template=None, **kwargs):
+    def __init__(self, data=None, width=None, height=None, font=None, base_font_size=None, template=None, geodata = False, geojson_url = None, geojson_property = None, geo_property = None, geo_value = None, **kwargs):
         """
         Initialise a Story object.
 
@@ -37,6 +40,25 @@ class Story:
             template.style.set_font(font)
         if base_font_size is not None:
             template.style.set_base_font_size(base_font_size)
+
+        #Managing geographical data
+        if geodata and None in [geojson_url, geojson_property, geo_property, geo_value]:
+            raise ValueError("if 'geodata' is True, you must provide 'geojson_url', 'geojson_property', 'geo_property', 'geo_value'")
+        if geodata:
+            if geojson_url: #Checking extension
+                if os.path.splitext(geojson_url)[1] not in [".geojson", ".json"]:
+                    raise ValueError("'geojson_url' must be a .geojson file")
+            if geo_property not in data.columns:
+                raise ValueError(f"'{geo_property}' must be a column in your dataframe")
+            if geo_value not in data.columns:
+                    raise ValueError(f"'{geo_value}' must be a column in your dataframe")
+
+        if geodata:
+            geo_dataframe = gpd.read_file(geojson_url)
+            geo_dataframe = geo_dataframe.merge(data, left_on = geojson_property, right_on = geo_property, how = "left")
+            geo_dataframe[geo_value] = geo_dataframe[geo_value].fillna(0)
+            data = geo_dataframe
+
 
         self.template = template
         self.font = template.font
@@ -104,7 +126,20 @@ class Story:
         # If the attribute is not callable (it is a property), we return it directly
         return attr
 
-    def add_title(self, title, subtitle=None, align = "center"):
+    def add_title(
+            self,
+            title,
+            subtitle=None,
+            background_color = None,
+            color = None,
+            align = "center",
+
+            img_url = None,
+            img_width = 80,
+            x_img_offset = -300,
+            y_img_offset = 0
+
+            ):
         """
         Adds a title layer (and optional subtitle) to the story.
 
@@ -112,6 +147,7 @@ class Story:
         - title: Main title text
         - subtitle: Subtitle text (optional)
         - align: hotizontal alignment, "left", "center" or "right" (default: "center")
+        - background_color (str, default = "None"): color of title block background
         returns:
         - self, to allow method chaining
         """
@@ -119,18 +155,38 @@ class Story:
         #GESTIONE ERRORI
         if align not in ["left", "center", "right"]:
             raise ValueError("title alignment (aling) must be one of: 'left', 'center', 'right'")
-        
 
+        background_color = background_color if background_color else self.colors["title_background_color"]
+        color = color if color else self.colors["title"]
+        
         self.story_layers.append({
             'type': 'title', 
             'title': title, 
             'subtitle': subtitle,
-            "align": align
+            "align": align,
+            "color": color,
+            "background_color": background_color,
+            "img_url": img_url,
+            "img_width": img_width,
+            "x_img_offset": x_img_offset,
+            "y_img_offset": y_img_offset
         })
         return self
 
-
-    def add_context(self, text, position='left', align = "middle", font_weight = "normal", font_style = "normal"):
+    def add_context(
+            self,
+            text,
+            position='left',
+            align = "middle",
+            font_weight = "normal",
+            font_style = "normal",
+            title = "CONTEXT",
+            img_url = None,
+            img_width = 60,
+            x_img_offset = -40,
+            y_img_offset = 0
+            # SEI QUI
+        ):
         """
         Adds a context layer to the story.
 
@@ -140,7 +196,8 @@ class Story:
         - position: The position of the text (default: ‘left’, can be 'left', 'right', 'top', 'bottom')
         - align: vertical alignment, "top", "middle" or "bottom" (default: "middle")
         - font_weight: "normal" (default) or "bold"
-        - font_style: "normal" (default) or "italic"
+        - font_style: "normal" (default) or "italic",
+        - title: customizable context area title (deaful: "CONTEXT")
         
         returns:
         - self, to allow method chaining
@@ -158,7 +215,6 @@ class Story:
         if font_style not in ["normal", "italic"]:
             raise ValueError("fontstyle must be one of: 'normal', 'italic'")
         
-
         font_size_px = self.em_to_px(self.font_sizes['context']) 
 
         box_width, _ = self._context_box_size(position)
@@ -176,7 +232,12 @@ class Story:
             'box_height': box_height,
             "align" : align,
             "font_weight" : font_weight,
-            "font_style" : font_style
+            "font_style" : font_style,
+            "title" : title,
+            "img_url": img_url,
+            "img_width": img_width,
+            "x_img_offset": x_img_offset,
+            "y_img_offset": y_img_offset
         })
 
         return self
@@ -186,8 +247,14 @@ class Story:
     def add_next_steps(
         self,
         steps,
+        text_align = "left",
         position='bottom',
-        title="What can we do next?"
+        title="Next steps",
+        mode = "horizontal",
+        img_url = None,
+        img_width = 45,
+        x_img_offset = -10,
+        y_img_offset = -25
     ):
 
 
@@ -199,6 +266,9 @@ class Story:
         steps : list[str] | str                                 Steps to display
         position : str, default=‘bottom’                        Position of the element (‘bottom’, ‘top’, ‘left’, ‘right’)
         title : str                                             Title displayed above the steps
+        mode : str, default='horizontal' Layout direction ('horizontal' or 'vertical')
+        text_align: str. Horizontal alignement of text ('left', 'center', ‘right’)
+        img_url: str | list: images to be associated to nextsteps and to be positioned next to them. You can used both local images or online images through links
         
         Returns
         -------
@@ -211,12 +281,22 @@ class Story:
             steps = [steps]
 
         if not isinstance(steps, list):
-            raise ValueError("The parameter 'steps' must be a list or a string")
+            raise TypeError("The parameter 'steps' must be a list or a string")
 
         if len(steps) > 5:
             raise ValueError("Maximum number of steps is 5")
         if len(steps) < 1:
             raise ValueError("Must provide at least one step")
+
+        if mode not in ["horizontal", "vertical"]:
+            raise ValueError("mode must be one of: 'horizontal', 'vertical'")
+
+        if img_url is not None:
+            if not isinstance(img_url, list or  str):
+                raise TypeError("'img_url' must be a list or a string")
+            else:
+                if len(img_url) != len(steps):
+                    raise ValueError("'img_url' must be the same length as 'steps'. If you do not want to associate an image to a nextstep, just write img_url = '' ")
 
         font_family = self.font
         font_size = self.em_to_px(self.font_sizes["nextstep"])
@@ -230,13 +310,18 @@ class Story:
         line_gap_px = self.chart_style.get('nextstep_line_gap_px', max(1.0, font_size * 0.15))
         line_height_px = font_size + line_gap_px
         layout_width = self._layout_width()
-        box_width = int((layout_width - gap * (len(steps) - 1)) / len(steps))
         min_box = self.chart_style['nextstep_min_box_width']
         max_box = self.chart_style['nextstep_max_box_width']
-        box_width = min(max(box_width, min_box), max_box)
 
-        content_width = (box_width * len(steps)) + (gap * (len(steps) - 1))
-        chart_width = max(layout_width, content_width)
+        # NUOVO
+        if mode == "horizontal":
+            box_width = int((layout_width - gap * (len(steps) - 1)) / len(steps))
+            box_width = min(max(box_width, min_box), max_box)
+            content_width = (box_width * len(steps)) + (gap * (len(steps) - 1))
+            chart_width = max(layout_width, content_width)
+        else: #vertical
+            box_width = min(layout_width, max_box)
+            chart_width = box_width
 
         box_color = self.colors['nextstep_box']
         box_border = self.colors['nextstep_border']
@@ -265,17 +350,53 @@ class Story:
         chart_body_height = uniform_box_height
 
         rows = []
-        for i, step_text in enumerate(wrapped_steps):
-            x_left = i * (box_width + gap)
-            rows.append({
-                'x': x_left,
-                'y': 0,
-                'x2': x_left + box_width,
-                'y2': uniform_box_height,
-                'text': step_text,
-                'x_mid': x_left + (box_width / 2),
-                'y_text': uniform_box_height - text_top_padding_px,
+
+        text_align = text_align if text_align is not None else self.chart_style['nextstep_text_align']
+        if mode == "horizontal":
+            uniform_box_height = max(box_heights) if box_heights else self.chart_style['nextstep_box_height']
+            chart_body_height = uniform_box_height
+            for i, step_text in enumerate(wrapped_steps):
+                x_left = i * (box_width + gap)
+                if text_align == "left":
+                    x_mid = x_left +  (box_width / 10)
+                elif text_align == "center":
+                    x_mid = x_left +  (box_width / 2)
+                else: #right
+                    x_mid = x_left + box_width - 10
+                rows.append({
+                    'x': x_left,
+                    'y': 0,
+                    'x2': x_left + box_width,
+                    'y2': uniform_box_height,
+                    'text': step_text,
+                    'x_mid': x_mid,
+                    'y_text': uniform_box_height - text_top_padding_px,
             })
+        else: #vertical
+            total_body_height = sum(box_heights) + (gap * (len(steps) - 1))
+            chart_body_height = total_body_height
+
+            current_top = total_body_height
+            for i, step_text in enumerate(wrapped_steps):
+                h_i = box_heights[i]
+                y_bottom = current_top - h_i
+                if text_align == "left":
+                    x_mid = (box_width / 10)
+                elif text_align == "center":
+                    x_mid = box_width / 2
+                else: #right
+                    x_mid = box_width - 10
+                rows.append({
+                    'x': 0,
+                    'y': y_bottom,
+                    'x2': box_width,
+                    'y2': current_top,
+                    'text': step_text,
+                    'x_mid': x_mid,
+                    'y_text': current_top - text_top_padding_px,
+                })
+                current_top = y_bottom - gap
+
         df_rect = pd.DataFrame(rows)
 
         rect = alt.Chart(df_rect).mark_rect(
@@ -297,19 +418,34 @@ class Story:
         text = alt.Chart(df_rect).mark_text(
             fontSize=font_size,
             font=font_family,
-            align=self.chart_style['nextstep_text_align'],
+            align = text_align,
             baseline='top',
             lineHeight=line_height_px,
             lineBreak=self.chart_style['text_line_break'],
             color=text_color,
-            clip=True
         ).encode(
             text='text:N',
             x=alt.X('x_mid:Q', axis=None),
             y=alt.Y('y_text:Q', axis=None),
         )
 
-        chart = alt.layer(rect, text)
+
+        if img_url:
+            df_rect["img_url"] = img_url
+            img_layer = alt.Chart(df_rect).mark_image(
+                width = img_width,
+                height = img_width,
+                baseline = "bottom",
+                xOffset = x_img_offset,
+                yOffset = y_img_offset
+            ).encode(
+                x = alt.X('x:Q', axis=None),
+                y = alt.Y('y:Q', axis=None),
+                url = "img_url:N",
+            )
+            chart = alt.layer(rect, text, img_layer)
+        else:
+            chart = alt.layer(rect, text)
 
         if title:
             chart = chart.properties(
@@ -318,7 +454,7 @@ class Story:
                     fontSize=title_size,
                     font=font_family,
                     color=title_color,
-                    offset=self.chart_style['nextstep_title_offset']
+                    offset=self.chart_style['nextstep_title_offset'],
                 )
             )
 
@@ -371,23 +507,48 @@ class Story:
         y=None,
         text=None,
         title=None,
-        dx=80,
-        dy=-60,
-        show_subject=True,
+        dx=0,
+        dy=0,
+        background_color = None,
+        text_color = None,
+        show_subject = False,
+        line_point_color = None,
+
+        img_url = None,
+        img_width = 60,
+        x_img_offset = 0,
+        y_img_offset = 0,
         **kwargs
     ):
         """
         Add an annotation layer for quantitative axes.
 
-        Parameters:
-        - x, y: Subject coordinates in chart data space
-        - text: Annotation body text
-        - title: Optional title prepended to text
-        - dx, dy: Pixel offsets from subject to box top-left corner
-        - show_subject: If True, draw subject marker
+        Parameters
+        ----------
+        x, y : float or int
+            Subject coordinates in chart data space.
+        text : str
+            Annotation body text.
+        title : str, optional
+            Optional title prepended to text.
+        dx, dy : float or int, default dx=80, dy=-60
+            Pixel offsets from subject to box top-left corner.
+        background_color : str, optional
+            Custom background color for the annotation box (e.g., hex code or name).
+            If None, falls back to default theme settings.
+        text_color : str, optional
+            Custom color for the annotation text.
+            If None, falls back to default theme settings.
+        show_subject : bool, default=False
+            If True, draws a point marker at the subject coordinates (x, y).
+        line_point_color: str, line and point color. Line links the annotation to the referring point.
+        **kwargs : dict
+            Unused keyword arguments. Raises TypeError if provided.
 
-        Returns:
-        - self
+        Returns
+        -------
+        self : Story object
+            The current instance for method chaining.
         """
         if kwargs:
             unknown = ", ".join(sorted(kwargs.keys()))
@@ -395,8 +556,8 @@ class Story:
 
         if x is None or y is None:
             raise ValueError("add_annotation requires x and y coordinates.")
-        if text is None:
-            raise ValueError("add_annotation requires text.")
+        if text is None and img_url is None:
+            raise ValueError("add_annotation requires text or/and img_url.")
 
         x_field, x_type = self._get_encoding_field_and_type('x')
         y_field, y_type = self._get_encoding_field_and_type('y')
@@ -462,7 +623,7 @@ class Story:
         text_left_padding_px = self.chart_style.get('annotation_text_left_padding_px', 2.0)
         text_top_padding_px = self.chart_style.get('annotation_text_top_padding_px', 2.0)
 
-        box_w_data = box_width_px * x_per_px
+        box_w_data = (box_width_px + 5 * (box_padding_px + text_left_padding_px)) * x_per_px
         box_h_data = (box_height_px + (2 * box_padding_px)) * y_per_px
         text_padding_h = ((box_padding_px + text_top_padding_px) * y_per_px)
 
@@ -513,67 +674,93 @@ class Story:
             'text_y': [text_y],
         })
 
-        text_color = self.colors.get('annotation_text', self.colors.get('callout_text', self.colors['context']))
-        box_fill = self.colors.get('annotation_fill', self.context_box['fill'])
+        text_color = text_color if text_color else self.colors.get('annotation_text', self.colors.get('callout_text', self.colors['context']))
+        box_fill = background_color if background_color else self.colors.get('annotation_fill', self.context_box['fill'])
         box_stroke = self.colors.get('annotation_stroke', self.context_box['stroke'])
-        line_color = box_stroke
-        point_color = box_stroke
+        line_color = line_point_color if line_point_color else text_color
+        point_color = line_color
         point_size = self.chart_style.get('annotation_point_size', self.chart_style.get('callout_point_size', 60))
         line_width = self.chart_style.get('annotation_line_width', self.chart_style.get('callout_arrow_line_width', 2))
         box_opacity = self.chart_style.get('annotation_box_opacity', self.chart_style.get('callout_box_opacity', 1.0))
         box_border_width = self.chart_style.get('annotation_box_border_width', self.chart_style.get('callout_box_border_width', 1))
 
         layers = []
-        if show_subject:
+        if show_subject == True:
+            dx = -50
+            dy = -50
             layers.append(
                 alt.Chart(annotation_data).mark_point(color=point_color, size=point_size).encode(
                     x=alt.X('subject_x:Q'),
-                    y=alt.Y('subject_y:Q')
+                    y=alt.Y('subject_y:Q'),
                 ).properties(width=self.chart.width, height=self.chart.height)
             )
 
-        layers.append(
-            alt.Chart(annotation_data).mark_rule(stroke=line_color, strokeWidth=line_width).encode(
-                x=alt.X('connector_x:Q'),
-                y=alt.Y('connector_y:Q'),
-                x2='tip_x',
-                y2='tip_y'
-            ).properties(width=self.chart.width, height=self.chart.height)
-        )
+            layers.append(
+                alt.Chart(annotation_data).mark_rule(stroke=line_color, strokeWidth=line_width).encode(
+                    x=alt.X('connector_x:Q'),
+                    y=alt.Y('connector_y:Q'),
+                    x2='tip_x',
+                    y2='tip_y'
+                ).properties(width=self.chart.width, height=self.chart.height)
+            )
 
-        layers.append(
-            alt.Chart(annotation_data).mark_rect(
-                color=box_fill,
-                opacity=box_opacity,
-                cornerRadius=self.context_box['corner_radius'],
-                stroke=box_stroke,
-                strokeWidth=box_border_width
-            ).encode(
-                x=alt.X('box_x1:Q'),
-                x2='box_x2',
-                y=alt.Y('box_y1:Q'),
-                y2='box_y2'
-            ).properties(width=self.chart.width, height=self.chart.height)
-        )
+        if text is not None:
+            layers.append(
+                alt.Chart(annotation_data).mark_rect(
+                    color=box_fill,
+                    opacity=box_opacity,
+                    cornerRadius=self.context_box['corner_radius'],
+                    stroke=box_stroke,
+                    strokeWidth=box_border_width,
+                    dx = dx,
+                    dy = dy
 
-        layers.append(
-            alt.Chart(annotation_data).mark_text(
-                text=wrapped_text,
-                align='left',
-                baseline='top',
-                font=self.font,
-                fontSize=label_size,
-                lineHeight=line_height_px,
-                lineBreak=self.chart_style['text_line_break'],
-                color=text_color
-            ).encode(
-                x=alt.X('text_x:Q'),
-                y=alt.Y('text_y:Q')
-            ).properties(width=self.chart.width, height=self.chart.height)
-        )
+                ).encode(
+                    x=alt.X('box_x1:Q'),
+                    x2='box_x2',
+                    y=alt.Y('box_y1:Q'),
+                    y2='box_y2'
+                ).properties(width=self.chart.width, height=self.chart.height)
+            )
+
+            layers.append(
+                alt.Chart(annotation_data).mark_text(
+                    text=wrapped_text,
+                    align='left',
+                    baseline='top',
+                    font=self.font,
+                    fontSize=label_size,
+                    lineHeight=line_height_px,
+                    lineBreak=self.chart_style['text_line_break'],
+                    color=text_color,
+                ).encode(
+                    x=alt.X('text_x:Q'),
+                    y=alt.Y('text_y:Q')
+                ).properties(width=self.chart.width, height=self.chart.height)
+            )
+
+        if img_url:
+            if text is not None:
+                x_img_offset = x_img_offset if x_img_offset else -50
+                y_img_offset = y_img_offset if y_img_offset else 50
+            layers.append(
+                alt.Chart(annotation_data)
+                    .mark_image(
+                        width = img_width,
+                        height = img_width,
+                        baseline = "middle",
+                        xOffset = x_img_offset,
+                        yOffset = y_img_offset
+                    ).encode(
+                        x=alt.X('text_x:Q'),
+                        y=alt.Y('text_y:Q'),
+                        url = alt.value(img_url)
+                    )
+            )
 
         self.story_layers.append({'type': 'annotation', 'chart': alt.layer(*layers)})
         return self
+    
 
     def add_line(
             self,
@@ -597,7 +784,7 @@ class Story:
         - orientation: 'horizontal' or 'vertical' (default: 'horizontal')
         - math: one of "min", "max", "mean" or "median", authomatically calculated. If used, "value" must be a list or a pandas serie.
         - color: line color. If not specified, the color specified in the Template file will be used.
-        - label_text (str, optional): Custom text displayed next to the line. If not provided (empty string), the line's numerical value is displayed instead. (Hint: if you do not want a label to be showed, use "label_text = " " - with a white space inside)".
+        - label_text (str, optional): Custom text displayed next to the line. If not provided (empty string), the line's numerical value is displayed instead. If you do not want a label to be showed, use "label_text = ''".
         - label_dx (float, optional): Horizontal offset (in pixels or data units) for the label position. Defaults to 0.
         - label_dy (float, optional): Vertical offset (in pixels or data units) for the label position. Defaults to 0.
         - label_font_size (str, optional): Font size of the label text.
@@ -737,16 +924,44 @@ class Story:
 
         return self
 
-    def add_highlight(self, category):
+    def add_highlight(
+            self,
+            category,
+
+            highlight_color = None,
+
+            img_url = None,
+            img_width = 35,
+            x_img_offset = 0,
+            y_img_offset = -25,
+
+            text_label = None,
+            label_font_size = 20,
+            label_text_angle = 90,
+            label_text_color = "black",
+            label_text_dx = 100,
+            label_text_dy = 0,
+            label_font_weight = "bold"
+            ):
         """
-        Highlights a single category in a bar chart and mutes the others.
+        Highlights a single category or value in a bar chart and mutes the others.
+
+        Supports categorical (N, O) as well as quantitative/temporal discrete 
+        axes (Q) to enable seamless integration with positioning methods like 
+        annotations.
 
         Parameters:
-        - category: Category value to highlight on the categorical axis.
+        -----------
+        category : str, int, float, or scalar, list, tuple, set
+            The category or discrete value to highlight on the target axis.
 
         Returns:
-        - self, to allow method chaining
+        --------
+        self : Story (or class instance)
+            The current instance to allow method chaining.
         """
+
+
         if not self._is_bar_chart():
             raise ValueError("add_highlight works only with bar charts.")
         if not isinstance(self.chart.data, pd.DataFrame):
@@ -754,59 +969,164 @@ class Story:
 
         x_field, x_type = self._get_encoding_field_and_type('x')
         y_field, y_type = self._get_encoding_field_and_type('y')
+        
         category_field = None
-        if x_type in ['N', 'O']:
-            category_field = x_field
-        elif y_type in ['N', 'O']:
-            category_field = y_field
+        category_type = None
+
+        #Accetta anche ':Q' per supportare assi temporali/numerici discreti(zzati)
+        if x_type in ['N', 'O', 'Q']:
+            category_field, category_type = x_field, x_type
+        elif y_type in ['N', 'O', 'Q']:
+            category_field, category_type = y_field, y_type
 
         if not category_field:
-            raise ValueError("add_highlight requires a categorical axis (N or O).")
+            raise ValueError("add_highlight requires a categorical (:N or :O) or quantitative axis (:Q).")
         if category_field not in self.chart.data.columns:
             raise ValueError(f"Category field '{category_field}' not found in chart data.")
 
-        values = self.chart.data[category_field].tolist()
-        category_key = str(category)
-        matched_category = None
-        for value in values:
-            if str(value) == category_key:
-                matched_category = value
-                break
-        if matched_category is None:
-            raise ValueError(f"Category '{category}' not found in field '{category_field}'.")
+        def _normalize(val):
+            if pd.isna(val):
+                return None
+            if isinstance(val, (int, float)):
+                if float(val).is_integer():
+                    return int(val)
+                return float(val)
+            return str(val).strip()
 
-        
-        #NUOVO (gestione highlights con serie di valori)
-        has_series, _ = self._get_encoding_field_and_type("color") #se nell'encoding del grafico è definito il valore "color"...
+        if not hasattr(self, '_highlighted_categories') or self._highlighted_categories is None:
+            self._highlighted_categories = []
+        if not hasattr(self, '_highlight_color_map') or self._highlight_color_map is None:
+            self._highlight_color_map = {}
+        if not hasattr(self, '_overlays') or self._overlays is None:
+            self._overlays = []
+
+        if isinstance(category, (list, tuple, set)):
+            categories = list(category)
+            target_norms = {_normalize(c) for c in categories}
+        else:
+            categories = category
+            target_norms = {_normalize(categories)}
+
+        matched_categories = []
+        for val in self.chart.data[category_field]:
+            norm_val = _normalize(val)
+            if norm_val in target_norms:
+                if not any(_normalize(mc) == norm_val for mc in matched_categories):
+                    matched_categories.append(val)
+
+
+        if not isinstance(category, (int, float)):
+            if not matched_categories:
+                raise ValueError(f"None of the values in '{category}' were found in field '{category_field}'.")
+
+            for cat in categories:
+                if cat not in matched_categories:
+                    warnings.warn(
+                        (f"Value '{cat}' was not found in the field '{category_field}'"),
+                        UserWarning
+                    )
+        else:
+            if not matched_categories:
+                raise ValueError(f"Value '{category}' was not found in field '{category_field}'.")
+
+
+        chosen_color = highlight_color if highlight_color else self.colors.get(
+            'bar_highlight',
+            self.chart_style.get('bar_fill_color', '#1d4ed8')
+        )
+
+        for val in matched_categories:
+            norm_val = _normalize(val)
+            if not any(_normalize(m) == norm_val for m in self._highlighted_categories):
+                self._highlighted_categories.append(val)
+            native_val = val.item() if hasattr(val, 'item') else val
+            self._highlight_color_map[native_val] = chosen_color
+
+
+        native_matched_global = [c.item() if hasattr(c, 'item') else c for c in self._highlighted_categories]
+        global_condition_clause = alt.FieldOneOfPredicate(
+            field = category_field,
+            oneOf = native_matched_global
+        )
+
+        native_matched_local = [c.item() if hasattr(c, 'item') else c for c in matched_categories]
+        local_condition_clause = alt.FieldOneOfPredicate(
+            field = category_field,
+            oneOf = native_matched_local
+        )
+
+        has_series, _ = self._get_encoding_field_and_type("color")
         if has_series is not None:
             self.chart = self.chart.encode(
-                opacity = alt.condition(
-                    alt.datum[category_field] == matched_category,
-                    alt.value(1),
+                opacity=alt.condition(
+                    global_condition_clause,
+                    alt.value(1.0),
                     alt.value(0.5)
                 )
             )
         else:
-            highlight_color = self.colors.get(
-                'bar_highlight',
-                self.chart_style.get('bar_fill_color', '#1d4ed8')
-            )
             muted_color = self.colors.get(
                 'bar_muted',
                 self.chart_style.get('axis_tick_color', '#cbd5e1')
             )
 
+            domain = list(self._highlight_color_map.keys())
+            range_colors = list(self._highlight_color_map.values())
+
             self.chart = self.chart.encode(
                 color=alt.condition(
-                    alt.datum[category_field] == matched_category,
-                    alt.value(highlight_color),
-                    alt.value(muted_color),
-                    legend=None
+                    global_condition_clause,
+                    alt.Color(
+                        f"{category_field}:{category_type}",
+                        scale = alt.Scale(domain = domain, range = range_colors),
+                        legend = None
+                    ),
+                    alt.value(muted_color)
                 )
             )
+
+        # Overlays
+        if img_url:
+            img_overlay = (
+                alt.Chart(self.chart.data)
+                .transform_filter(local_condition_clause)
+                .mark_image(
+                    width = img_width,
+                    height = img_width,
+                    baseline = "bottom",
+                    xOffset = x_img_offset,
+                    yOffset = y_img_offset
+                ).encode(
+                    x = f"{x_field}:{x_type}",
+                    y = f"{y_field}:{y_type}",
+                    url = alt.value(img_url),
+                )
+            )
+            self._overlays.append(img_overlay)
+
+        if text_label:
+            text_overlay = (
+                alt.Chart(self.chart.data)
+                .transform_filter(local_condition_clause)
+                .mark_text(
+                    text = text_label,
+                    fontSize = label_font_size,
+                    fontWeight = label_font_weight,
+                    angle = label_text_angle,
+                    dx = label_text_dx,
+                    dy = label_text_dy,
+                    color = label_text_color
+                )
+                .encode(
+                    x = f"{x_field}:{x_type}",
+                    y = f"{y_field}:{y_type}",
+                )
+            )
+            self._overlays.append(text_overlay)
+
         return self
-    
         
+
 
     def em_to_px(self, em):
         """
@@ -952,31 +1272,37 @@ class Story:
         layout_width = self._layout_width()
         base = alt.Chart(pd.DataFrame({'_': [0]})).properties(
             width=layout_width,
-            height=self.chart_style['title_area_height']
+            height=self.chart_style['title_area_height'],
         )
 
         align_mode = layer.get("align", "center") #default center
 
         if align_mode == "left":
-            x_position = 0
+            x_position = 10
         elif align_mode == "right":
-            x_position = layout_width
+            x_position = layout_width - 10
         else: #default, center
             x_position = layout_width/2
 
-
+        # NUOVO
+        title_background = base.mark_rect(
+            color = layer.get("background_color", "transparent"), #default transparent
+        )
+        
         title_chart = base.mark_text(
             text=layer['title'],
+            font=self.chart_style["title_font"],
             fontSize=self.em_to_px(self.font_sizes['title']),
             fontWeight=self.chart_style['title_font_weight'],
             align = align_mode,
             baseline=self.chart_style['title_baseline'],
-            font=self.font,
-            color=self.colors['title']
+            color=layer.get("color", self.colors["title"])
         ).encode(
             x = alt.value(x_position),
             y = alt.value(self.chart_style['title_y'])
         )
+
+        final_chart = title_background + title_chart
         
         if layer['subtitle']:
             subtitle_chart = base.mark_text(
@@ -990,8 +1316,23 @@ class Story:
                 x = alt.value(x_position),
                 y = alt.value(self.chart_style['subtitle_y'])
             )
-            return title_chart + subtitle_chart
-        return title_chart
+            final_chart += subtitle_chart
+
+        if layer["img_url"]:
+            image_layer = base.mark_image(
+                width = layer["img_width"],
+                height = layer["img_width"],
+                baseline = "middle",
+                xOffset = layer["x_img_offset"],
+                yOffset = layer["y_img_offset"]
+            ).encode(
+                x = alt.value(x_position),
+                y = alt.value(self.chart_style['subtitle_y'] - self.chart_style['title_y']), #Centers
+                url = alt.value(layer["img_url"])
+            )
+            final_chart += image_layer
+        
+        return final_chart
 
 
     def create_text_layer(self, layer):
@@ -1054,31 +1395,42 @@ class Story:
             box_height = self._text_block_height(layer.get('text', ''), font_size)
 
 
-        #Gestione dell'allineamento verticale del blocco di testo rispetto al grafico
         position_side = layer.get("position")
+        side_context_count = sum(
+            1 for l in self.story_layers 
+            if l.get('type') == 'context' and l.get('position') == position_side
+        )
+        #Gestione dell'allineamento verticale del blocco di testo rispetto al grafico
         if position_side in ["left", "right"]:
             
             align_mode = layer.get("align")
+            # Soltanto un context box
+            if side_context_count == 1:
+                if align_mode == "top":
+                    chart_height = box_height
+                    y_start = 0
+                    y_end = box_height
+                    text_y_position = padding
 
-            if align_mode == "top":
+                elif align_mode == "bottom":
+                    chart_height = box_height
+                    y_start = self.height - box_height
+                    y_end = self.height
+                    text_y_position = y_start + padding
+
+                else: #middle
+                    chart_height = box_height
+                    remaining_space = self.height - box_height
+                    y_start = remaining_space / 2
+                    y_end = y_start + box_height
+                    text_y_position = y_start + padding
+            # Più di un context box
+            else:
                 chart_height = box_height
                 y_start = 0
                 y_end = box_height
                 text_y_position = padding
-
-            elif align_mode == "bottom":
-                chart_height = self.height
-                y_start = self.height - box_height
-                y_end = self.height
-                text_y_position = y_start + padding
-
-            else: #middle
-                chart_height = self.height
-                remaining_space = self.height - box_height
-                y_start = remaining_space / 2
-                y_end = y_start + box_height
-                text_y_position = y_start + padding
-        
+            
         else: #fallback per position top o bottom
             chart_height = box_height
             y_start = 0
@@ -1120,9 +1472,44 @@ class Story:
             y=alt.value(text_y_position)
         )
 
-        return alt.layer(box, text)
+        final_chart = box + text
 
+        title = layer.get("title")
+        if title:
+            title_layer = base.mark_text(
+                text=title,
+                fontSize=self.em_to_px(self.font_sizes["context"]) + 5,
+                font=self.font,
+                color=self.colors["context"],
+                fontWeight="bold",
+                align = "center",
+                baseline="bottom",
+            ).encode(
+                x=alt.value(box_width / 2),
+                y=alt.value(y_start - 5)
+            )
 
+            final_chart += title_layer
+
+        if layer["img_url"]:
+            if position_side in ["left", "right"]:
+                y_encoding = box_height
+            else:
+                y_encoding = 0
+            image_layer = base.mark_image(
+                width = layer["img_width"],
+                height = layer["img_width"],
+                baseline = "top",
+                xOffset = layer["x_img_offset"],
+                yOffset = layer["y_img_offset"]
+            ).encode(
+                x = alt.value(0),
+                y = alt.value(y_encoding),
+                url = alt.value(layer["img_url"])
+            )
+            final_chart += image_layer
+
+        return final_chart
 
 
     def _context_box_size(self, position):
@@ -1212,7 +1599,7 @@ class Story:
             else:
                 lines = textwrap.wrap(
                     paragraph, 
-                    width=max_chars, 
+                    width=max_chars,
                     break_long_words=False, 
                     break_on_hyphens=False,
                     replace_whitespace=False,
@@ -1231,11 +1618,13 @@ class Story:
     def _layout_width(self):
         width = self.chart.width
         has_left = any(
-            layer.get('type') == 'context' and layer.get('position') == 'left'
+            layer.get('type') == 'context' and layer.get('position') == 'left' or
+            layer.get('type') == 'special_cta' and layer.get('position') == 'left'#NUOVO
             for layer in self.story_layers
         )
         has_right = any(
-            layer.get('type') == 'context' and layer.get('position') == 'right'
+            layer.get('type') == 'context' and layer.get('position') == 'right' or
+            layer.get('type') == 'special_cta' and layer.get('position') == 'right' #NUOVO
             for layer in self.story_layers
         )
         if has_left:
@@ -1371,7 +1760,9 @@ class Story:
                          dx=0,
                          dy=0,
                          font_size=11,
-                         font_weight="normal"
+                         font_weight="normal",
+                         geodata = False,
+                         geodata_label = None
                          ):
         '''
         Add text labels to an existing chart.
@@ -1415,10 +1806,11 @@ class Story:
         self
             Returns the current instance to allow method chaining.
 
-        '''
+        '''        
+
         has_series, _ = self._get_encoding_field_and_type('color')
-        if has_series is not None:
-            raise ValueError("add_labels_chart can NOT be used on charts with multiple series")
+        if has_series is not None and geodata is False:
+            raise ValueError("add_labels_chart can NOT be used on charts with multiple series. For geographical data use 'geodata = True'")
 
 
         if not isinstance(angle, (int, float)) and not isinstance(angle, bool):
@@ -1449,6 +1841,37 @@ class Story:
         if font_weight != "bold":
             font_weight = "normal"
 
+        if color != "":
+            mark_color = color
+        else:
+            mark_color = self.colors["chart_label_color"]
+
+
+        if geodata:
+            if geodata_label is None:
+                raise ValueError("You must specify a value of 'geodata_label'")
+            else:
+                values = self.data
+                centroids = values.geometry.to_crs(epsg=3035).centroid.to_crs(epsg=4326)
+                values["lon"] = centroids.x
+                values["lat"] = centroids.y
+                self.label_layer = alt.Chart(values[values[geodata_label].notna()]).mark_text(
+                    align = "center",
+                    dx = dx,
+                    dy = dy,
+                    lineBreak="\n",
+                    angle = angle,
+                    color = mark_color,
+                    fontSize = font_size,
+                    fontWeight = font_weight
+                ).encode(
+                    longitude = "lon:Q",
+                    latitude = "lat:Q",
+                    text = geodata_label
+                )
+
+                return self
+
         try:
             if values:
                 labels = values
@@ -1461,11 +1884,6 @@ class Story:
 
 
         text_encoding = alt.Text(labels)
-
-        if color != "":
-            mark_color = color
-        else:
-            mark_color = self.colors["chart_label_color"]
 
         self.label_layer = alt.Chart(self.data).encode(
             x=self.encoding['x'],
@@ -1504,12 +1922,12 @@ class Story:
             # raise ValueError('save value must be one of "svg", "png", "pdf"')
             
 
-        def _vstack(charts):
+        def _vstack(charts, spacing = 1):
             if not charts:
                 return None
             if len(charts) == 1:
                 return charts[0]
-            return alt.vconcat(*charts)
+            return alt.vconcat(*charts, spacing = spacing)
 
         # Let's start with the basic graph
         main_chart = self._apply_trendline_end_labels(self.chart)
@@ -1571,9 +1989,14 @@ class Story:
             elif layer['type'] == 'line':
                 overlay_charts.append(layer['chart'])
 
+        #Overlaying management in add_highlight() method
+        if hasattr(self, '_overlays') and self._overlays:
+            overlay_charts.extend(self._overlays)
+
         # Overlaying the layers on the main graph
         for overlay in overlay_charts:
             main_chart += overlay
+
 
         # Build the final layout
         left_stack = _vstack(left_charts)

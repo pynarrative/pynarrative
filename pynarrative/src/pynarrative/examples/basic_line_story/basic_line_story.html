@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.17.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "strokeWidth": 0}, "axis": {"domainColor": "#c7d2fe", "grid": false, "labelColor": "#334e68", "labelFont": "Helvetica", "labelFontSize": 13, "tickColor": "#c7d2fe", "titleColor": "#0b1f3a", "titleFont": "Helvetica", "titleFontSize": 14}, "bar": {"color": "#1d4ed8"}, "legend": {"labelColor": "#334e68", "labelFont": "Helvetica", "labelFontSize": 12, "titleColor": "#0b1f3a", "titleFont": "Helvetica", "titleFontSize": 12}, "mark": {"strokeWidth": 2.5}, "range": {"category": ["#1d4ed8", "#3b82f6", "#60a5fa", "#93c5fd"]}, "title": {"color": "#0b1f3a", "font": "Helvetica", "fontSize": 32}}, "vconcat": [{"layer": [{"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#0b1f3a", "font": "Helvetica", "fontSize": 32, "fontWeight": "bold", "text": "Product A Outpaces Product B"}, "encoding": {"x": {"value": 300.0}, "y": {"value": 4}}}, {"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#2a4f85", "font": "Helvetica", "fontSize": 24, "text": "Six-month sales trend comparison"}, "encoding": {"x": {"value": 300.0}, "y": {"value": 38}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 70, "width": 600}, {"vconcat": [{"vconcat": [{"layer": [{"mark": {"type": "rect", "color": "#eff6ff", "cornerRadius": 8, "opacity": 1.0, "stroke": "#bfdbfe", "strokeWidth": 1}, "encoding": {"x": {"value": 0}, "x2": {"value": 600.0}, "y": {"value": 0}, "y2": {"value": 213.6}}}, {"mark": {"type": "text", "align": "left", "baseline": "top", "color": "#102a43", "font": "Helvetica", "fontSize": 19, "lineBreak": "\n", "lineHeight": 24.7, "text": "Product A shows a steeper growth trend, while\nProduct B remains mostly flat. The gap widens over\ntime, suggesting B needs targeted improvements to\ncatch up in the next quarter.Product A shows a\nsteeper growth trend, while Product B remains\nmostly flat. The gap widens over time, suggesting B\nneeds targeted improvements to catch up in the next\nquarter."}, "encoding": {"x": {"value": 8}, "y": {"value": 8}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 213.6, "width": 600.0}, {"layer": [{"data": {"name": "data-d14c5c804d7963e3bc379dbeb8739330"}, "mark": {"type": "line"}, "encoding": {"color": {"field": "product", "legend": null, "type": "nominal"}, "x": {"field": "month", "type": "quantitative"}, "y": {"field": "sales", "type": "quantitative"}}}, {"data": {"name": "data-2eee5ef2d73ed0cfdcbc5fbfcb29af01"}, "mark": {"type": "text", "align": "left", "baseline": "middle", "clip": false, "dx": 8, "font": "Helvetica", "fontSize": 13}, "encoding": {"color": {"field": "product", "legend": null, "type": "nominal"}, "text": {"field": "product", "type": "nominal"}, "x": {"field": "month", "type": "quantitative"}, "y": {"field": "sales", "type": "quantitative"}}}, {"data": {"name": "data-d14c5c804d7963e3bc379dbeb8739330"}, "mark": {"type": "text", "align": "center", "angle": 0, "baseline": "middle", "color": "#3b5b8a", "font": "Helvetica", "fontSize": 16, "lineBreak": "\n", "text": "Source: Internal sales dataset"}, "encoding": {"x": {"value": 300.0}, "y": {"value": 458}}}], "height": 400, "width": 600}]}, {"hconcat": [{"layer": [{"mark": {"type": "rect", "color": "#dbeafe", "cornerRadius": 8, "opacity": 1.0, "stroke": "#93c5fd", "strokeWidth": 1}, "encoding": {"x": {"axis": null, "field": "x", "type": "quantitative"}, "x2": {"field": "x2"}, "y": {"axis": null, "field": "y", "type": "quantitative"}, "y2": {"field": "y2"}}}, {"mark": {"type": "text", "align": "center", "baseline": "middle", "color": "#102a43", "font": "Helvetica", "fontSize": 13, "lineBreak": "\n", "lineHeight": 18}, "encoding": {"text": {"field": "text", "type": "nominal"}, "x": {"axis": null, "field": "x_mid", "type": "quantitative"}, "y": {"axis": null, "field": "y_mid", "type": "quantitative"}}, "transform": [{"calculate": "(datum.x + datum.x2)/2", "as": "x_mid"}, {"calculate": "(datum.y + datum.y2)/2", "as": "y_mid"}]}], "height": 116, "title": {"text": ["What can we do next?"], "color": "#0b1f3a", "font": "Helvetica", "fontSize": 18, "offset": 10}, "width": 864}], "data": {"name": "data-5a9dfc007b91e0df3c6a44420833d1c7"}}]}], "resolve": {"axis": {"x": "independent", "y": "independent"}}, "$schema": "https://vega.github.io/schema/vega-lite/v5.17.0.json", "datasets": {"data-6fad5c34291b82fc9632cbce143d677a": [{"_": 0}], "data-d14c5c804d7963e3bc379dbeb8739330": [{"month": 1, "sales": 12, "product": "A"}, {"month": 2, "sales": 14, "product": "A"}, {"month": 3, "sales": 17, "product": "A"}, {"month": 4, "sales": 21, "product": "A"}, {"month": 5, "sales": 26, "product": "A"}, {"month": 6, "sales": 32, "product": "A"}, {"month": 1, "sales": 10, "product": "B"}, {"month": 2, "sales": 11, "product": "B"}, {"month": 3, "sales": 12, "product": "B"}, {"month": 4, "sales": 13, "product": "B"}, {"month": 5, "sales": 14, "product": "B"}, {"month": 6, "sales": 15, "product": "B"}], "data-2eee5ef2d73ed0cfdcbc5fbfcb29af01": [{"month": 6, "sales": 32, "product": "A"}, {"month": 6, "sales": 15, "product": "B"}], "data-5a9dfc007b91e0df3c6a44420833d1c7": [{"x": 0.0, "y": 0, "x2": 160.0, "y2": 86, "text": "Refresh B's\npricing & bundles"}, {"x": 176.0, "y": 0, "x2": 336.0, "y2": 86, "text": "Boost B's\nvisibility with\ncampaigns"}, {"x": 352.0, "y": 0, "x2": 512.0, "y2": 86, "text": "Improve B's\nfeatures via\nfeedback"}, {"x": 528.0, "y": 0, "x2": 688.0, "y2": 86, "text": "Boost B's\nvisibility with\ncampaigns"}, {"x": 704.0, "y": 0, "x2": 864.0, "y2": 86, "text": "Improve B's\nfeatures via\nfeedback"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.17.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "strokeWidth": 0}, "axis": {"domainColor": "#e5e7eb", "grid": false, "labelColor": "#334155", "labelFont": "Helvetica", "labelFontSize": 13, "tickColor": "#e5e7eb", "titleColor": "#0f172a", "titleFont": "Helvetica", "titleFontSize": 14}, "legend": {"labelColor": "#334155", "labelFont": "Helvetica", "labelFontSize": 12, "titleColor": "#0f172a", "titleFont": "Helvetica", "titleFontSize": 12}, "mark": {"strokeWidth": 2.5}, "range": {"category": ["#1d4ed8", "#94a3b8", "#0ea5e9", "#64748b"]}, "title": {"color": "#0f172a", "font": "Helvetica", "fontSize": 32}}, "vconcat": [{"layer": [{"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#0f172a", "font": "Helvetica", "fontSize": 32, "fontWeight": "bold", "text": "Conversion Rate vs Target"}, "encoding": {"x": {"value": 465.0}, "y": {"value": 4}}}, {"mark": {"type": "text", "align": "center", "baseline": "top", "color": "#475569", "font": "Helvetica", "fontSize": 24, "text": "Horizontal threshold highlights the KPI objective"}, "encoding": {"x": {"value": 465.0}, "y": {"value": 38}}}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}, "height": 70, "width": 930.0}, {"hconcat": [{"vconcat": [{"layer": [{"mark": {"type": "rect", "color": "#f8fafc", "cornerRadius": 8, "opacity": 1.0, "stroke": "#e2e8f0", "strokeWidth": 1}, "encoding": {"x": {"value": 0}, "x2": {"value": 310.0}, "y": {"value": 0}, "y2": {"value": 190.0}}}, {"mark": {"type": "text", "align": "left", "baseline": "top", "color": "#0f172a", "font": "Helvetica", "fontSize": 19, "lineBreak": "\n", "lineHeight": 24.7, "text": "The target threshold is\n0.70. Values above the\nline meet the monthly\nobjective."}, "encoding": {"x": {"value": 8}, "y": {"value": 8}}}], "height": 190.0, "width": 310.0}], "data": {"name": "data-6fad5c34291b82fc9632cbce143d677a"}}, {"layer": [{"data": {"name": "data-01a4264ddde7fde33a93b7dbda3ae503"}, "mark": {"type": "line"}, "encoding": {"x": {"field": "month", "title": "Month", "type": "quantitative"}, "y": {"field": "conversion_rate", "title": "Conversion Rate", "type": "quantitative"}}}, {"data": {"name": "data-d8c2e797ac95ec09589de94b8b708b80"}, "mark": {"type": "rule", "color": "#334155", "strokeDash": [6, 4], "strokeWidth": 2}, "encoding": {"y": {"field": "y", "type": "quantitative"}}}, {"data": {"name": "data-01a4264ddde7fde33a93b7dbda3ae503"}, "mark": {"type": "text", "align": "center", "angle": 0, "baseline": "middle", "color": "#64748b", "font": "Helvetica", "fontSize": 16, "lineBreak": "\n", "text": "Source: Product analytics KPI dashboard"}, "encoding": {"x": {"value": 310.0}, "y": {"value": 438}}}], "height": 380, "width": 620}]}], "resolve": {"axis": {"x": "independent", "y": "independent"}}, "$schema": "https://vega.github.io/schema/vega-lite/v5.17.0.json", "datasets": {"data-6fad5c34291b82fc9632cbce143d677a": [{"_": 0}], "data-01a4264ddde7fde33a93b7dbda3ae503": [{"month": 1, "conversion_rate": 0.58}, {"month": 2, "conversion_rate": 0.62}, {"month": 3, "conversion_rate": 0.67}, {"month": 4, "conversion_rate": 0.71}, {"month": 5, "conversion_rate": 0.69}, {"month": 6, "conversion_rate": 0.74}], "data-d8c2e797ac95ec09589de94b8b708b80": [{"y": 0.7}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

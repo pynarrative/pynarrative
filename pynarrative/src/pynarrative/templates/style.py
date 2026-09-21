@@ -45,6 +45,21 @@ class Style(UserDict):
         self.font = font
         return self
 
+    @property
+    def title_font(self):
+        return self.data.get('title_font', self.font)
+
+    @title_font.setter
+    def title_font(self, value):
+        self.data['title_font'] = value
+
+    def get_title_font(self):
+        return self.title_font
+
+    def set_title_font(self, title_font):
+        self.title_font = title_font
+        return self
+
     def get_base_font_size(self):
         return self.base_font_size
 
@@ -78,44 +93,47 @@ class DefaultStyle(Style):
     """
     Default visual style values (fonts, colors, stroke/text settings).
     """
-
     def __init__(self):
         super().__init__({
-            'font': 'Helvetica',
+            'font': 'Noto Sans',
+            'title_font':"Noto Sans",
+
             'base_font_size': 12,
             'font_sizes': {
                 'title': 1.6,
-                'subtitle': 1.3,
-                'context': 1.3,
-                'nextstep': 1.2,
-                'cta': 1.2,
-                'source': 0.95,
+                'subtitle': 1.2,
+                'context': 1,
+                'nextstep': 1,
+                'cta': 1,
+                'source': 0.9,
                 "line_label" : 1.5
             },
             'colors': {
-                'title': '#0b1f3a',
-                'subtitle': '#2a4f85',
-                'context': '#102a43',
-                'bar_highlight': '#1d4ed8',
-                'bar_muted': '#cbd5e1',
-                'callout_text': '#102a43',
-                'callout_arrow': '#1d4ed8',
-                'callout_point': '#1d4ed8',
-                'nextstep': '#1d4ed8',
-                'nextstep_box': '#dbeafe',
-                'nextstep_border': '#93c5fd',
-                'nextstep_text': '#102a43',
-                'nextstep_title': '#0b1f3a',
-                'cta': '#2563eb',
-                'source': '#3b5b8a',
+                'title': '#000000',
+                "title_background_color": "transparent",
+                'subtitle': '#000000',
+                'context': '#000000',
+                'bar_highlight': '#A88A7C',
+                'bar_muted': '#7C9AA8',
+                'callout_text': '#000000',
+                'callout_arrow': '#CBB9B1',
+                'callout_point': '#CBB9B1',
+                'nextstep': '#CBB9B1',
+                'nextstep_box': '#CBB9B1',
+                'nextstep_border': '#CBB9B1',
+                'nextstep_text': '#000000',
+                'nextstep_title': '#000000',
+                'source': '#000000',
                 'chart_label_color': "#000000",
+                'annotation_fill': "#CBB9B185",
+                'annotation_stroke': '#CBB9B1',
             },
             'context_box': {
-                'fill': '#eff6ff',
-                'stroke': '#bfdbfe',
+                'fill': '#CBB9B1',
+                'stroke': '#CBB9B1',
                 'opacity': 1.0,
-                'padding': 8,
-                'corner_radius': 8,
+                'padding': 15,
+                'corner_radius': 16,
             },
             'label_color': '#334e68',
             'title_color': '#0b1f3a',
@@ -130,20 +148,20 @@ class DefaultStyle(Style):
             'line_stroke_width': 2.5,
             'bar_fill_color': '#1d4ed8',
             'series_colors': ['#1d4ed8', '#3b82f6', '#60a5fa', '#93c5fd'],
-            'reference_line_color': '#1e3a8a',
+            'reference_line_color': '#BF2626',
             'reference_line_width': 2,
             'reference_line_dash': [6, 4],
             'nextstep_font_size': 13,
             'nextstep_title_size_delta': 5,
             'nextstep_corner_radius': 8,
-            'nextstep_border_width': 1,
+            'nextstep_border_width': 2,
             'nextstep_opacity': 1.0,
             'nextstep_line_height': 18,
             'nextstep_text_align': 'center',
             'nextstep_text_baseline': 'middle',
-            'nextstep_text_top_padding_px': 6,
-            'nextstep_text_bottom_padding_px': 6,
-            'nextstep_text_side_padding_px': 1,
+            'nextstep_text_top_padding_px': 15,
+            'nextstep_text_bottom_padding_px': 15,
+            'nextstep_text_side_padding_px': 15,
             'nextstep_line_gap_px': 2,
             'callout_arrow_size': 40,
             'callout_label_size': 12,
@@ -151,7 +169,7 @@ class DefaultStyle(Style):
             'callout_point_size': 60,
             'callout_arrow_line_width': 2,
             'callout_arrow_head_scale': 2.2,
-            'callout_box_border_width': 1,
+            'callout_box_border_width': 2,
             'callout_max_width_ratio': 0.45,
             'callout_max_height_ratio': 0.22,
             'callout_label_line_height_ratio': 1.3,
@@ -178,12 +196,12 @@ class DefaultStyle(Style):
             'text_line_break': '\n',
             'source_vertical_angle': 270,
             'source_horizontal_angle': 0,
-            'context_border_width': 1,
+            'context_border_width': 2,
             'context_text_align': 'left',
             'context_text_baseline': 'top',
             'context_line_height_ratio': 1.3,
             'text_wrap_line_height_ratio': 1.2,
-            'text_wrap_char_width_ratio': 0.6,
+            'text_wrap_char_width_ratio': 0.45,
             'text_wrap_min_char_width': 6,
             'text_wrap_min_chars': 12,
             'trendline_label_align': 'left',
@@ -198,14 +216,14 @@ class DefaultStyle(Style):
             'annotation_tip_offset_ratio': 0.05,
             'annotation_label_size': 12,
             'annotation_line_height_ratio': 1.3,
-            'annotation_padding': 1,
-            'annotation_text_left_padding_px': 2,
-            'annotation_text_top_padding_px': 10,
+            'annotation_padding': 10,
+            'annotation_text_left_padding_px': 5,
+            'annotation_text_top_padding_px': 5,
             'annotation_char_width_ratio': 0.5,
             'annotation_min_char_width': 6,
             'annotation_line_gap_px':1.5,
-            'annotation_box_opacity': 1.0,
-            'annotation_box_border_width': 1,
+            'annotation_box_opacity': 1,
+            'annotation_box_border_width': 2.0,
             'annotation_box_height_multiplier_base': 1.0,
             'annotation_box_height_multiplier_per_line': 0.0,
         })
