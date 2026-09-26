@@ -130,8 +130,8 @@ class myLayout(Layout):
             title_area_height=58,
             title_y=15, #title vertical offset
             subtitle_y=30,
-            preferred_width=760,
-            preferred_height=560,
+            preferred_width=900,
+            preferred_height=400,
             layout_context_side_width_ratio = 0.74, #title block width multiplier
             context_right_width_ratio = 0.5, #right context block width multiplier
             context_left_width_ratio = 0.5, #left context block width multiplier
