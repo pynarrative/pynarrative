@@ -125,6 +125,7 @@ class Story:
         self.context_box = self.style['context_box']
         self.chart_style = {**self.style, **self.layout}
         self.config = {}
+        self._warned_about_manual_override = False
 
     @staticmethod
     def chart_style_value(template, key, default):
@@ -254,12 +255,15 @@ class Story:
         })
         return self
 
+
     def add_context(
             self,
             text,
             text_align = "left",
             position='left',
             align = "middle",
+            width_multiplier = None,
+            height_multiplier = None,
             font_weight = "normal",
             font_style = "normal",
             title = "CONTEXT",
@@ -280,6 +284,12 @@ class Story:
             align (str, optional): Vertical alignment relative to the chart when `position` is
                 `'left'` or `'right'`. Must be one of `'top'`, `'middle'`, or `'bottom'`.
                 Defaults to "middle".
+            width_multiplier (int, float, optional): Box width multiplier (suggested values: from 0.1 to 4).
+                If omitted or None, uses the value from the template (if used),
+                falling back to the standard value (1.7)
+            height_multiplier (int, float, optional): Box height multiplier (suggested values: from 0.1 to 0.75).
+                If omitted or None, uses the value from the template (if used),
+                falling back to the standard value (0.33)
             font_weight (str, optional): Font weight for the context text.
                 Must be one of `'normal'` or `'bold'`. Defaults to "normal".
             font_style (str, optional): Font style for the context text.
@@ -302,6 +312,8 @@ class Story:
 
         Raises:
             TypeError: If `text` or `title` is not a string.
+            TypeError: If `width_multiplier` is not int or float.
+            TypeError: If `height_multiplier` is not int or float.
             ValueError: If `text_align` is not one of `'left'`, `'center'`, or `'right'`.
             ValueError: If `position` is not one of `'left'`, `'right'`, `'top'`, or `'bottom'`.
             ValueError: If `align` is specified with `position` set to `'top'` or `'bottom'`.
@@ -325,6 +337,10 @@ class Story:
             raise ValueError("Vertical alignment ('align') cannot be customized when 'position' is 'top' or 'bottom'")
         if align not in ["top", "middle", "bottom"]:
             raise ValueError(f"Invalid 'align' value: '{align}'. Must be one of: 'top', 'middle', 'bottom'")
+        if not isinstance(width_multiplier, (int, float)) and width_multiplier is not None:
+            raise TypeError(f"'width_multiplier' must be int or float, got {type(width_multiplier).__name__}")
+        if not isinstance(height_multiplier, (int, float)) and height_multiplier is not None:
+            raise TypeError(f"'height_multiplier' must be int or float, got {type(height_multiplier).__name__}")
         if font_weight not in ["normal", "bold"]:
             raise ValueError(f"Invalid 'font_weight' value: '{font_weight}'. Must be one of: 'normal', 'bold'")
         if font_style not in ["normal", "italic"]:
@@ -334,13 +350,15 @@ class Story:
         
         font_size_px = self.em_to_px(self.font_sizes['context']) 
 
-        box_width, _ = self._context_box_size(position)
+        self._calculate_width_multipliers(text, position, block_type_ = "context", width_multiplier = width_multiplier, height_multiplier = height_multiplier)
+
+        box_width, box_height = self._context_box_size(position)
         wrapped_text = self._wrap_text_for_width(
             text,
             box_width=box_width,
             font_size_px=font_size_px,
         )
-        box_height = self._text_block_height(wrapped_text, font_size_px, block_type = "context")
+
         self.story_layers.append({
             'type': 'context', 
             'text': wrapped_text,
@@ -367,6 +385,8 @@ class Story:
         steps,
         text_align = "left",
         position='bottom',
+        width_multiplier = None,
+        height_multiplier = 1,
         title="NEXT STEPS",
         title_dy = 0,
         title_dx = 0,
@@ -386,6 +406,12 @@ class Story:
                 Must be one of `'left'`, `'center'`, or `'right'`. Defaults to "left".
             position (str, optional): Position of the entire element relative to the chart.
                 Must be one of `'bottom'`, `'top'`, `'left'`, or `'right'`. Defaults to "bottom".
+            width_multiplier (int, float, optional): Box width multiplier (suggested values: from 0.1 to 4).
+                If omitted or None, uses the value from the template (if used),
+                falling back to the standard value (1.7)
+            height_multiplier (int, float, optional): Box height multiplier (suggested values: from 0.1 to 4).
+                If omitted or None, uses the value from the template (if used),
+                falling back to the standard value
             title (str, optional): Main title header displayed above the next steps.
                 Defaults to "NEXT STEPS".
             title_dy (int | float, optional): Vertical offset in pixels for the title.
@@ -411,6 +437,8 @@ class Story:
         Raises:
             TypeError: If `steps` is not a string or a list of strings.
             TypeError: If `img_url` is provided but is neither a string nor a list.
+            TypeError: If `width_multiplier` is not int or float.
+            TypeError: If `height_multiplier` is not int or float.
             ValueError: If `steps` is empty or contains more than 5 elements.
             ValueError: If `position` is not one of `'bottom'`, `'top'`, `'left'`, or `'right'`.
             ValueError: If `text_align` is not one of `'left'`, `'center'`, or `'right'`.
@@ -430,6 +458,10 @@ class Story:
             raise ValueError("Maximum number of steps is 5")
         if position not in ["bottom", "top", "left", "right"]:
             raise ValueError(f"Invalid 'position' value: '{position}'. Must be one of: 'bottom', 'top', 'left', 'right'")
+        if not isinstance(width_multiplier, (int, float)) and width_multiplier is not None:
+            raise TypeError(f"'width_multiplier' must be int or float, got {type(width_multiplier).__name__}")
+        if not isinstance(height_multiplier, (int, float)) and height_multiplier is not None:
+            raise TypeError(f"'height_multiplier' must be int or float, got {type(height_multiplier).__name__}")
         if text_align not in ["left", "center", "right"]:
             raise ValueError(f"Invalid 'text_align' value: '{text_align}'. Must be one of: 'left', 'center', 'right'")
         if mode not in ["horizontal", "vertical"]:
@@ -443,6 +475,8 @@ class Story:
 
         if img_width <= 0:
             raise ValueError("'img_width' must be a positive number")
+
+        self._calculate_width_multipliers(steps, position, block_type_ = f"nextsteps_{mode}", width_multiplier = width_multiplier, height_multiplier = None)
 
         font_family = self.font
         font_size = self.em_to_px(self.font_sizes["nextstep"])
@@ -460,8 +494,7 @@ class Story:
 
         # NUOVO
         if mode == "horizontal":
-            box_width = int((layout_width - gap * (len(steps) - 1)) / len(steps))
-            box_width = min(max(box_width, min_box), max_box)
+            box_width, _ = self._context_box_size(position) #Il calcolo della larghezza utilizza lo stesso metodo del box di contesto per questioni di uniformità grafica
             content_width = (box_width * len(steps)) + (gap * (len(steps) - 1))
             chart_width = max(layout_width, content_width)
         else: #vertical
@@ -471,6 +504,7 @@ class Story:
         box_color = self.colors['nextstep_box']
         box_border = self.colors['nextstep_border']
         text_color = self.colors['nextstep_text']
+
 
         wrapped_steps = []
         box_heights = []
@@ -483,15 +517,15 @@ class Story:
             wrapped_steps.append(wrapped)
             box_heights.append(self._text_block_height(wrapped, font_size, block_type = "nextsteps"))  #uniformazione alla gestione dei box di contesto
 
-        uniform_box_height = max(box_heights) if box_heights else self.chart_style['nextstep_box_height']
+
+        uniform_box_height = (max(box_heights) * height_multiplier) if box_heights else self.chart_style['nextstep_box_height']
         chart_body_height = uniform_box_height
+
 
         rows = []
 
         text_align = text_align if text_align is not None else self.chart_style['nextstep_text_align']
         if mode == "horizontal":
-            uniform_box_height = max(box_heights) if box_heights else self.chart_style['nextstep_box_height']
-            chart_body_height = uniform_box_height
             for i, step_text in enumerate(wrapped_steps):
                 x_left = i * (box_width + gap)
                 if text_align == "left":
@@ -601,7 +635,6 @@ class Story:
                     offset = title_dy,
                 )
             )
-
 
         self.story_layers.append({
             'type': 'special_cta',
@@ -776,17 +809,28 @@ class Story:
             )
         )
         max_chars = max(int(max_width_px / max(approx_char_width, 1e-9)), self.chart_style['text_wrap_min_chars'])
-        wrapped_lines = textwrap.wrap(
-            note_text,
-            width=max_chars,
-            break_long_words=False,
-            break_on_hyphens=False
-        ) or [""]
-        wrapped_text = "\n".join(wrapped_lines)
+
+        paragraphs = text.split("\n")
+        wrapped_text = []
+
+        for paragraph in paragraphs:
+            if not paragraph.strip():
+                wrapped_text.append("")
+            else:
+                wrapped_lines = textwrap.wrap(
+                    paragraph, 
+                    width=max_chars,
+                    break_long_words=False, 
+                    break_on_hyphens=False,
+                    replace_whitespace=False,
+                )
+                
+                wrapped_text.extend(wrapped_lines if wrapped_lines else [paragraph])
+
 
         max_line_chars = max(max(len(line), 1) for line in wrapped_lines)
         box_width_px = min(max_line_chars * approx_char_width, max_width_px)
-        box_height_px = max(len(wrapped_lines), 1) * line_height_px
+        box_height_px = max(len(wrapped_text), 1) * line_height_px
         box_padding_px = self.chart_style.get(
             'annotation_padding',
             self.chart_style.get('padding', 6)
@@ -884,7 +928,7 @@ class Story:
                     stroke=box_stroke,
                     strokeWidth=box_border_width,
                     dx = dx,
-                    dy = dy
+                    dy = dy,
 
                 ).encode(
                     x=alt.X('box_x1:Q'),
@@ -894,9 +938,11 @@ class Story:
                 ).properties(width=self.chart.width, height=self.chart.height)
             )
 
+
+            # SEI QUI
             layers.append(
                 alt.Chart(annotation_data).mark_text(
-                    text=wrapped_text,
+                    text = wrapped_text,
                     align='left',
                     baseline='top',
                     font=self.font,
@@ -1194,6 +1240,10 @@ class Story:
         if img_url is not None and img_width <= 0:
             raise ValueError("'img_width' must be a positive number")
 
+        if highlight_color is not None:
+            if not isinstance(highlight_color, str) or not highlight_color.strip():
+                raise ValueError("'highlight_color' must be a valid color string (ex: 'red' or '#E7473C')")
+
         x_field, x_type = self._get_encoding_field_and_type('x')
         y_field, y_type = self._get_encoding_field_and_type('y')
         
@@ -1230,7 +1280,7 @@ class Story:
 
         if isinstance(category, (list, tuple, set)):
             categories_list = list(category)
-        else:
+        elif isinstance(category, (int, float, str)):
             categories_list = [category]
 
         target_norms = {_normalize(c) for c in categories_list}
@@ -1767,6 +1817,127 @@ class Story:
             height * self.chart_style['context_left_height_ratio']
         )
 
+    def _calculate_width_multipliers(self, text, position, block_type_, width_multiplier, height_multiplier):
+        if not getattr(self, "_warned_about_manual_override", False):
+            print("Tip: If you encounter layout issues, you can manually override width and height multipliers in 'add_context' and 'add_next_steps'.")
+            self._warned_about_manual_override = True
+
+        block_type = block_type_.split("_")[0]
+        mode = block_type_.split("_")[-1]
+
+        multiplier_w = None
+        multiplier_h = None
+
+        if width_multiplier is None or height_multiplier is None:
+
+            if block_type == "context":
+                n_token = len(text.split())
+            else: #nextsteps
+                if mode == "horizontal":
+                    n_token = max(len(t.split()) for t in text)/len(text)
+                else: #vertical
+                    n_token = max(len(t.split()) for t in text)
+
+            if position in ["left", "right"]:
+                if n_token <= 15:
+                    multiplier_w = 0.3
+                    multiplier_h = 0.3
+                elif n_token <= 30:
+                    multiplier_w = 0.4
+                    multiplier_h = 0.4
+                elif n_token <= 50:
+                    multiplier_w = 0.5
+                    multiplier_h = 0.4
+                elif n_token <= 100:
+                    multiplier_w = 0.6
+                    multiplier_h = 0.55
+                elif n_token <= 150:
+                    multiplier_w = 0.7
+                    multiplier_h = 0.65
+                elif n_token <= 200:
+                    multiplier_w = 0.8
+                    multiplier_h = 0.75
+                elif n_token <= 250:
+                    multiplier_w = 0.9
+                    multiplier_h = 0.85
+                elif n_token <= 350:
+                    multiplier_w = 0.95
+                    multiplier_h = 0.9
+                elif n_token <= 400:
+                    multiplier_w = 1
+                    multiplier_h = 0.95
+                elif n_token <= 450:
+                    multiplier_w = 1.1
+                    multiplier_h = 1
+                elif n_token <= 500:
+                    multiplier_w = 1.15
+                    multiplier_h = 1.05
+                elif n_token <= 550:
+                    multiplier_w = 1.2
+                    multiplier_h = 1.15
+                else:  # n_token > 550
+                    multiplier_w = 1.5
+                    multiplier_h = 1.3
+                    warnings.warn("In case of layout problems with very long texts (> 500 words), we suggest you to manually change multipliers values by passing them as arguments to 'add_context' and 'add_next_steps' methods", UserWarning)
+
+            
+            else:  # position top or bottom
+                if n_token <= 15:
+                    multiplier_w = 1
+                    multiplier_h = 0.15
+                elif n_token <= 30:
+                    multiplier_w = 1.55
+                    multiplier_h = 0.2
+                elif n_token <= 50:
+                    multiplier_w = 1.6
+                    multiplier_h = 0.3
+                elif n_token <= 100:
+                    multiplier_w = 1.6
+                    multiplier_h = 0.35
+                elif n_token <= 150:
+                    multiplier_w = 1.7
+                    multiplier_h = 0.4
+                elif n_token <= 200:
+                    multiplier_w = 1.8
+                    multiplier_h = 0.45
+                elif n_token <= 250:
+                    multiplier_w = 1.9
+                    multiplier_h = 0.5
+                elif n_token <= 350:
+                    multiplier_w = 2
+                    multiplier_h = 0.6
+                elif n_token <= 500:
+                    multiplier_w = 2.2
+                    multiplier_h = 0.65
+                else:  # n_token > 500
+                    multiplier_w = 2.4
+                    multiplier_h = 0.75
+                    warnings.warn("In case of layout problems with very long texts (> 500 words), we suggest you to manually change multipliers values by passing them as arguments to 'add_context' and 'add_next_steps' methods", UserWarning)
+
+        if width_multiplier is not None:
+            multiplier_w = width_multiplier
+        if height_multiplier is not None:
+            multiplier_h = height_multiplier
+
+        # default   
+        if multiplier_w is not None:
+            if block_type == "nextsteps":
+                if mode == "horizontal" and position == "bottom":
+                    multiplier_w = multiplier_w/len(text)
+                else: #vertical
+                    multiplier_w = multiplier_w + 0.05 #piccola correzione
+
+            multiplier_w = multiplier_w
+            parameter_w = f"context_{position}_width_ratio"
+            self.chart_style[parameter_w] = multiplier_w
+            print(f"setting self.chart_style[{parameter_w}] = {multiplier_w}")
+        if multiplier_h is not None:
+            parameter_h = f"context_{position}_height_ratio"
+            self.chart_style[parameter_h] = multiplier_h
+            print(f"setting self.chart_style[{parameter_h}] = {multiplier_h}")
+
+
+
     def _wrap_text_for_box(self, text, box_width, box_height, font_size_px):
 
         if text is None:
@@ -1846,6 +2017,7 @@ class Story:
         lines = (str(text).splitlines() if text is not None else [""])
         line_count = max(len(lines), 1)
         return (line_count * line_height) + padding
+    
     def _layout_width(self):
         width = self.chart.width
         width += self.chart.width * self.chart_style['layout_context_side_width_ratio']
@@ -2081,12 +2253,17 @@ class Story:
         if geodata:
             if geodata_label is None:
                 raise ValueError("When 'geodata=True', you must specify 'geodata_label'.")
+            elif ":" not in geodata_label:
+                raise ValueError("You must specify the geodata_label value encoding (ex: 'value:Q' for quantities or 'word:N' for nominal values).")
             else:
+                label = geodata_label.split(":")[0]
+                label_encoding = geodata_label.split(":")[1]
+                
                 values = self.data.copy()
                 centroids = values.geometry.to_crs(epsg=3035).centroid.to_crs(epsg=4326)
                 values["lon"] = centroids.x
                 values["lat"] = centroids.y
-                self.label_layer = alt.Chart(values[values[geodata_label].notna()]).mark_text(
+                self.label_layer = alt.Chart(values[values[label].notna()]).mark_text(
                     align = "center",
                     dx = dx,
                     dy = dy,
@@ -2098,7 +2275,7 @@ class Story:
                 ).encode(
                     longitude = "lon:Q",
                     latitude = "lat:Q",
-                    text=f"{geodata_label}:N",
+                    text=f"{label}:{label_encoding}",
                 )
 
                 return self
@@ -2198,6 +2375,7 @@ class Story:
             raise TypeError(f"'filename' must be a string or False, got {type(filename).__name__}")
 
         if save == "png":
+            if ppi is False or ppi is None: ppi = 150
             if not isinstance(ppi, (int, float)) or ppi <= 0:
                 raise TypeError("'ppi' must be a positive number.")
             if ppi > 500:
@@ -2205,9 +2383,6 @@ class Story:
                     f"A high ppi value ({ppi}) was provided. This may significantly slow down chart rendering.",
                     UserWarning,
                 )
-        elif ppi is False or ppi is None:
-            ppi = 150
-            
 
         def _vstack(charts, spacing = 1):
             if not charts:
