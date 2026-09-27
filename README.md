@@ -1,4 +1,5 @@
 # Pynarrative: Transform Data Visualizations into Stories
+[Pynarrative logo](pynarrative_logo.png)
 
 ## Installation
 
