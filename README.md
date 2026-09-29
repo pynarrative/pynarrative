@@ -1,5 +1,4 @@
 # Pynarrative: Transform Data Visualizations into Stories
-<img src="img/pynarrative_logo.png" alt="Pynarrative logo" width="150"/>
 
 ## Installation
 
@@ -134,32 +133,25 @@ geopandas
 These dependencies will be automatically installed if they're not already present in your environment.
 
 ## Getting Started
-<!-- RIVEDERE -->
-
 PyNarrative is designed to be intuitive while providing powerful narrative capabilities. Here are two comprehensive examples showcasing both basic usage and advanced features:
 
 ### Basic Example
 
-
-```python
-
+<div style = "white-space: pre-wrap; word-break: break-word; font-family:monospace">
 import pandas as pd
 import pynarrative as pn
 import altair as alt
 
 colosseum = pd.DataFrame({
-    "year" : [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-             2020, 2021, 2022, 2023, 2024],
-    "visitors" : [5.201, 5.625, 6.182, 6.551, 6.409, 7.036, 7.650, 7.618,
-                 1.086, 1.689, 9.812, 12.298, 14.733]
+    "year" : [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    "visitors" : [5.201, 5.625, 6.182, 6.551, 6.409, 7.036, 7.650, 7.618, 1.086, 1.689, 9.812, 12.298, 14.733]
 })
 
 story = (
     pn.Story(
     #Builing the Story class object
         data = colosseum,
-        width = 550,
-        height = 350,
+        #Not using any width and heighth, pynarrative vill apply the default values
         #Not using any template, pynarrative will apply its defaultTemplate,
         #with default colors and dimensions
     )
@@ -204,16 +196,7 @@ story = (
     .add_context(
         position = "top",
         title = "An introduction",
-        text = """The Colosseum (Italian: Colosseo) is an elliptical amphitheatre in
-                the centre of the city of Rome, Italy,just east of the Roman Forum. It is
-                the largest ancient amphitheatre ever built, and is the largest standing
-                amphitheatre in the world. Construction began under the Emperor Vespasian
-                in 72 and was completed in AD 80 under his successor and heir, Titus.
-                Further modifications were made during the reign of Domitian. The three
-                emperors who were patrons of the work are known as the Flavian dynasty,
-                and the amphitheatre was named the Flavian Amphitheatre (Latin:
-                Amphitheatrum lavium; Italian: Anfiteatro Flavio) by later classicists and
-                archaeologists for its association with their family name (Flavius)."""
+        text = "The Colosseum (Italian: Colosseo) is an elliptical amphitheatre in the centre of the city of Rome, Italy,just east of the Roman Forum. It is the largest ancient amphitheatre ever built, and is the largest standing amphitheatre in the world. Construction began under the Emperor Vespasian in 72 and was completed in \n AD 80 under his successor and heir, Titus. Further modifications were made during the reign of Domitian. The three emperors who were patrons of the work are known as the Flavian dynasty, and the amphitheatre was named the Flavian Amphitheatre (Latin: Amphitheatrum lavium; Italian: Anfiteatro Flavio) by later classicists and archaeologists for its association with their family name (Flavius).",
 
     )
 
@@ -221,13 +204,7 @@ story = (
     .add_context(
         position = "left",
         title = "An analysis of tourism flows",
-        text = """Between 2012 and 2019, the Colosseum Archaeological Park saw steady
-                visitor growth, consistently surpassing the historical average of 7.07
-                million. Following a drastic plunge in 2020–2021 due to COVID-19
-                pandemic restrictions (reaching a low of 1.08 million), the reopening
-                of international travel sparked a massive \"revenge tourism\" boom.
-                By 2024, visitor numbers reached an all-time high of 14.73 million—more
-                than doubling the period's overall average.""",
+        text = "Between 2012 and 2019, the Colosseum \n Archaeological Park saw steady visitor growth, consistently surpassing the historical average of 7.07 million. Following a drastic plunge in 2020–2021 due to COVID-19 pandemic restrictions (reaching a low of 1.08 million), the reopening of international travel sparked a massive \"revenge tourism\" boom. By 2024, visitor numbers reached an all-time high of 14.73 million—more than doubling the period's overall average.",
     )
 
     #Highlghing 2020 and 2024 bars
@@ -246,7 +223,7 @@ story = (
 )
 
 story #Visualizing the data story
-```
+</div>
 
 **Here is the result:**
 
@@ -254,11 +231,8 @@ story #Visualizing the data story
 
 
 
-
 ### Advanced Example with Customization
-
-```python
-
+<div style = "white-space: pre-wrap; word-break: break-word; font-family:monospace;">
 import pandas as pd
 import pynarrative as pn
 import altair as alt
@@ -267,8 +241,7 @@ story = (
     pn.Story(
     #Builing the Story class object
         data = colosseum,
-        width = 600, #Increasing width
-        height = 350,
+        #Not using any width and heighth, pynarrative vill apply the default values
         #Not using any template, pynarrative will apply its defaultTemplate,
         # with default colors and dimensions
     )
@@ -317,28 +290,13 @@ story = (
     .add_context(
         position = "top",
         title = "An introduction",
-        text = """The Colosseum (Italian: Colosseo) is an elliptical amphitheatre in
-                the centre of the city of Rome, Italy,just east of the Roman Forum. It is
-                the largest ancient amphitheatre ever built, and is the largest standing
-                amphitheatre in the world. Construction began under the Emperor Vespasian
-                in 72 and was completed in AD 80 under his successor and heir, Titus.
-                Further modifications were made during the reign of Domitian. The three
-                emperors who were patrons of the work are known as the Flavian dynasty,
-                and the amphitheatre was named the Flavian Amphitheatre (Latin:
-                Amphitheatrum lavium; Italian: Anfiteatro Flavio) by later classicists and
-                archaeologists for its association with their family name (Flavius)."""
+        text = "The Colosseum (Italian: Colosseo) is an elliptical amphitheatre in the centre of the city of Rome, Italy,just east of the Roman Forum. It is the largest ancient amphitheatre ever built, and is the largest standing amphitheatre in the world. Construction began under the Emperor Vespasian in 72 and was completed in \n AD 80 under his successor and heir, Titus. Further modifications were made during the reign of Domitian. The three emperors who were patrons of the work are known as the Flavian dynasty, and the amphitheatre was named the Flavian Amphitheatre (Latin: Amphitheatrum lavium; Italian: Anfiteatro Flavio) by later classicists and archaeologists for its association with their family name (Flavius).",
     )
 
     .add_context(
         position = "left",
-        text = """Between 2012 and 2019, the Colosseum Archaeological Park saw steady
-                visitor growth, consistently surpassing the historical average of 7.07
-                million. Following a drastic plunge in 2020–2021 due to COVID-19
-                pandemic restrictions (reaching a low of 1.08 million), the reopening
-                of international travel sparked a massive \"revenge tourism\" boom.
-                By 2024, visitor numbers reached an all-time high of 14.73 million—more
-                than doubling the period's overall average.""",
         title = "An analysis of tourism flows",
+        text = "Between 2012 and 2019, the Colosseum \n Archaeological Park saw steady visitor growth, consistently surpassing the historical average of 7.07 million. Following a drastic plunge in 2020–2021 due to COVID-19 pandemic restrictions (reaching a low of 1.08 million), the reopening of international travel sparked a massive \"revenge tourism\" boom. By 2024, visitor numbers reached an all-time high of 14.73 million—more than doubling the period's overall average.",
     )
 
     .add_labels_chart(
@@ -413,7 +371,7 @@ story = (
 )
 
 story #Visualizing the data story
-```
+</div>
 
 **Here is the result:**
 
