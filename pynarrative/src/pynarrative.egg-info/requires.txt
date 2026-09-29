@@ -1,0 +1,4 @@
+altair
+geopandas
+numpy
+pandas
