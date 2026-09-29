@@ -1,5 +1,5 @@
 # Pynarrative: Transform Data Visualizations into Stories
-<img src="img/pynarrative_logo.png" alt="Logo Pynarrative" style="width:100px">
+<img src="img/pynarrative_logo.png" alt="Logo Pynarrative" width="100">
 
 ## Installation
 
@@ -427,4 +427,6 @@ Pynarrative is released under the MIT License, allowing both personal and commer
 
 ## Authors
 
-Pynarrative was implemented by Roberto Olinto Barsotti as a master's thesis project in digital humanities, under the supervision of professor Angelica Lo Duca. It was then developped by Lorenzo Ferrante as a bachelor's thesis project in digital humanities, also under the supervision of professor Lo Duca.
+- Pynarrative 1.0: Roberto Olinto Barsotti
+- Pynarrative 2.0: Lorenzo Ferrante
+- Supervisor: professor Angelica Lo Duca
