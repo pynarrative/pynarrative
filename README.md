@@ -138,8 +138,7 @@ PyNarrative is designed to be intuitive while providing powerful narrative capab
 
 ### Basic Example
 
-<div style = "white-space: pre-wrap; word-break: break-word; font-family:monospace">
-import pandas as pd
+<pre style="white-space: pre-wrap; word-break: break-word;">import pandas as pd
 import pynarrative as pn
 import altair as alt
 
@@ -153,8 +152,7 @@ story = (
     #Builing the Story class object
         data = colosseum,
         #Not using any width and heighth, pynarrative vill apply the default values
-        #Not using any template, pynarrative will apply its defaultTemplate,
-        #with default colors and dimensions
+        #Not using any template, pynarrative will apply its defaultTemplate, with default colors and dimensions
     )
 
     #Method invocation and chaining
@@ -185,7 +183,7 @@ story = (
         position = "top",
         align = "right"
     )
-    
+
     #Title and subtitle
     .add_title(
         title = "Number of visitors to the Colosseum archaeological park in Rome",
@@ -198,7 +196,6 @@ story = (
         position = "top",
         title = "An introduction",
         text = "The Colosseum (Italian: Colosseo) is an elliptical amphitheatre in the centre of the city of Rome, Italy,just east of the Roman Forum. It is the largest ancient amphitheatre ever built, and is the largest standing amphitheatre in the world. Construction began under the Emperor Vespasian in 72 and was completed in \n AD 80 under his successor and heir, Titus. Further modifications were made during the reign of Domitian. The three emperors who were patrons of the work are known as the Flavian dynasty, and the amphitheatre was named the Flavian Amphitheatre (Latin: Amphitheatrum lavium; Italian: Anfiteatro Flavio) by later classicists and archaeologists for its association with their family name (Flavius).",
-
     )
 
     #Context area (on the left)
@@ -219,22 +216,18 @@ story = (
         dy = -10 #Moving the labels slightly upwards.
     )
 
-
     .render() #Rendering the data story
 )
 
-story #Visualizing the data story
-</div>
+story #Visualizing the data story</pre>
 
 **Here is the result:**
 
 ![Example 1](img/example1.png)
 
 
-
 ### Advanced Example with Customization
-<div style = "white-space: pre-wrap; word-break: break-word; font-family:monospace;">
-import pandas as pd
+<pre style="white-space: pre-wrap; word-break: break-word;">import pandas as pd
 import pynarrative as pn
 import altair as alt
 
@@ -243,8 +236,7 @@ story = (
     #Builing the Story class object
         data = colosseum,
         #Not using any width and heighth, pynarrative vill apply the default values
-        #Not using any template, pynarrative will apply its defaultTemplate,
-        # with default colors and dimensions
+        #Not using any template, pynarrative will apply its defaultTemplate, with default colors and dimensions
     )
 
     #Method invocation and chaining
@@ -372,7 +364,7 @@ story = (
 )
 
 story #Visualizing the data story
-</div>
+</pre>
 
 **Here is the result:**
 
