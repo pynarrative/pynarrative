@@ -810,25 +810,25 @@ class Story:
         )
         max_chars = max(int(max_width_px / max(approx_char_width, 1e-9)), self.chart_style['text_wrap_min_chars'])
 
-        paragraphs = text.split("\n")
+        lines = text.split("\n")
         wrapped_text = []
 
-        for paragraph in paragraphs:
-            if not paragraph.strip():
+        for line in lines:
+            if not line.strip():
                 wrapped_text.append("")
             else:
                 wrapped_lines = textwrap.wrap(
-                    paragraph, 
-                    width=max_chars,
+                    line, 
+                    width = max_chars - 15, #piccola correzione
                     break_long_words=False, 
                     break_on_hyphens=False,
                     replace_whitespace=False,
                 )
-                
-                wrapped_text.extend(wrapped_lines if wrapped_lines else [paragraph])
+
+            wrapped_text.extend(wrapped_lines if wrapped_lines else [lines])
 
 
-        max_line_chars = max(max(len(line), 1) for line in wrapped_lines)
+        max_line_chars = max(max(len(wrapped_line), 1) for wrapped_line in wrapped_text)
         box_width_px = min(max_line_chars * approx_char_width, max_width_px)
         box_height_px = max(len(wrapped_text), 1) * line_height_px
         box_padding_px = self.chart_style.get(
@@ -1058,19 +1058,19 @@ class Story:
             
             clean_values = [v for v in value if pd.notna(v)]
 
-            if math == "mean": #Media
+            if math == "mean": #Mean
                 line_value = round(sum(clean_values) / len(clean_values), 2)
                 print(f"Mean = {line_value}")
 
-            elif math == "median": #Mediana
+            elif math == "median": #Median
                 line_value = round(float(np.median(clean_values)), 2)
                 print(f"Median = {line_value}")
 
-            elif math == "min": #Minimo
+            elif math == "min": #Min
                 line_value = round(float(min(clean_values)), 2)
                 print(f"Min = {line_value}")
 
-            elif math == "max": #Massimo
+            elif math == "max": #Max
                 line_value = round(float(max(clean_values)), 2)
                 print(f"Max = {line_value}")
         else:
