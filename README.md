@@ -28,6 +28,21 @@ Story(
     **kwargs
 )
 
+
+add_labels_chart(
+    values=None,
+    color=None,
+    orientation='horizontal',
+    angle=0,
+    dx=0,
+    dy=0,
+    font_size=11,
+    font_weight='normal',
+    geodata=False,
+    geodata_label=None
+)
+
+
 add_title(
     title,
     subtitle=None,
