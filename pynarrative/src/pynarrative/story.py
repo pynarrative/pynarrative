@@ -810,7 +810,10 @@ class Story:
         )
         max_chars = max(int(max_width_px / max(approx_char_width, 1e-9)), self.chart_style['text_wrap_min_chars'])
 
-        lines = text.split("\n")
+        if text is None:
+            lines = "no line"
+        else:
+            lines = text.split("\n")
         wrapped_text = []
 
         for line in lines:
@@ -1738,7 +1741,6 @@ class Story:
         text = base.mark_text(
             text=layer['text'],
             fontSize=font_size,
-            # align=self.chart_style['context_text_align'],
             align = text_align,
             baseline=self.chart_style['context_text_baseline'],
             font=self.font,
