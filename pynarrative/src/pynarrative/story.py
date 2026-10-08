@@ -942,7 +942,6 @@ class Story:
             )
 
 
-            # SEI QUI
             layers.append(
                 alt.Chart(annotation_data).mark_text(
                     text = wrapped_text,
@@ -2093,39 +2092,51 @@ class Story:
         x_field, x_type = self._get_encoding_field_and_type('x')
         y_field, y_type = self._get_encoding_field_and_type('y')
         color_field, color_type = self._get_encoding_field_and_type('color')
+        
         if not x_field or not y_field or not color_field:
             return base_chart
         if x_field not in self.chart.data.columns or y_field not in self.chart.data.columns or color_field not in self.chart.data.columns:
             return base_chart
 
-        labels_df = (
-            self.chart.data.sort_values(x_field)
-            .groupby(color_field, as_index=False)
-            .tail(1)
-            .copy()
-        )
-        if labels_df.empty:
-            return base_chart
+        color_encoding = getattr(self.chart.encoding, 'color', None)
+        if color_encoding is not None:
+            color_dict = color_encoding.to_dict()
+            custom_legend = "legend" in color_dict
+        else:
+            custom_legend = False
 
-        base_no_legend = base_chart.encode(
-            color=alt.Color(f'{color_field}:{color_type}', legend=None)
-        )
+        if custom_legend is False:
 
-        labels = alt.Chart(labels_df).mark_text(
-            align=self.chart_style['trendline_label_align'],
-            baseline=self.chart_style['trendline_label_baseline'],
-            dx=self.chart_style['trendline_label_dx'],
-            clip=self.chart_style['trendline_label_clip'],
-            font=self.font,
-            fontSize=self.chart_style['axis_label_size'],
-        ).encode(
-            x=alt.X(f'{x_field}:{x_type}'),
-            y=alt.Y(f'{y_field}:{y_type}'),
-            text=alt.Text(f'{color_field}:N'),
-            color=alt.Color(f'{color_field}:{color_type}', legend=None)
-        )
+            labels_df = (
+                self.chart.data.sort_values(x_field)
+                .groupby(color_field, as_index=False)
+                .tail(1)
+                .copy()
+            )
+            if labels_df.empty:
+                return base_chart
 
-        return base_no_legend + labels
+            base_no_legend = base_chart.encode(
+                color=alt.Color(f'{color_field}:{color_type}', legend=None)
+            )
+
+            labels = alt.Chart(labels_df).mark_text(
+                align=self.chart_style['trendline_label_align'],
+                baseline=self.chart_style['trendline_label_baseline'],
+                dx=self.chart_style['trendline_label_dx'],
+                clip=self.chart_style['trendline_label_clip'],
+                font=self.font,
+                fontSize=self.chart_style['axis_label_size'],
+            ).encode(
+                x=alt.X(f'{x_field}:{x_type}'),
+                y=alt.Y(f'{y_field}:{y_type}'),
+                text=alt.Text(f'{color_field}:N'),
+                color=alt.Color(f'{color_field}:{color_type}', legend=None)
+            )
+
+            return base_no_legend + labels
+        
+        return base_chart
 
     def configure_view(self, *args, **kwargs):
         """
