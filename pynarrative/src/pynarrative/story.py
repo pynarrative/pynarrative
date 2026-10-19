@@ -99,8 +99,7 @@ class Story:
 
         if geodata:
             geo_dataframe = gpd.read_file(geojson_url)
-            geo_dataframe = geo_dataframe.merge(data, left_on = geojson_property, right_on = geo_property, how = "left")
-            geo_dataframe[geo_value] = geo_dataframe[geo_value].fillna(0)
+            geo_dataframe = geo_dataframe.merge(data, left_on = geojson_property, right_on = geo_property, how = "left").fillna(0)
             data = geo_dataframe
 
 
@@ -2289,6 +2288,11 @@ class Story:
                     longitude = "lon:Q",
                     latitude = "lat:Q",
                     text=f"{label}:{label_encoding}",
+                    color = alt.condition(
+                        f"datum.{label} == 0",
+                        alt.value('transparent'),
+                        alt.value(mark_color)
+                    )
                 )
 
                 return self
