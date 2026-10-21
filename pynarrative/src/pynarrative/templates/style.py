@@ -208,6 +208,7 @@ class DefaultStyle(Style):
             'trendline_label_baseline': 'middle',
             'trendline_label_clip': False,
             'bar_label_line_height': 14,
+            'axis_label_weight': "normal", 
             'annotation_line_width': 2,
             'annotation_arrow_size': 40,
             'annotation_point_size': 60,
