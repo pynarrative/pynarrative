@@ -2126,6 +2126,7 @@ class Story:
                 clip=self.chart_style['trendline_label_clip'],
                 font=self.font,
                 fontSize=self.chart_style['axis_label_size'],
+                fontWeight = self.chart_style['axis_label_weight'],
             ).encode(
                 x=alt.X(f'{x_field}:{x_type}'),
                 y=alt.Y(f'{y_field}:{y_type}'),
